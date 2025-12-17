@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, StyleSheet, FlatList, TouchableOpacity, Animated } from 'react-native';
 import { Text, Surface, Chip, Searchbar, Button } from 'react-native-paper';
 import { Colors, Spacing } from '../../constants/colors';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -16,6 +16,71 @@ const TASKS = [
 const FILTER_OPTIONS = ['All', 'Available', 'Completed', 'Pending'];
 const ICON_COLOR = '#5B9FFF';
 
+const TaskItem = ({ item, index, navigation }) => {
+    const fadeAnim = useRef(new Animated.Value(0)).current;
+    const slideAnim = useRef(new Animated.Value(20)).current;
+
+    useEffect(() => {
+        Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 500,
+            delay: index * 100, // Stagger effect
+            useNativeDriver: true,
+        }).start();
+
+        Animated.spring(slideAnim, {
+            toValue: 0,
+            friction: 6,
+            tension: 40,
+            delay: index * 100,
+            useNativeDriver: true,
+        }).start();
+    }, []);
+
+    return (
+        <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
+            <Surface style={styles.card} elevation={1} onPress={() => navigation.navigate('TaskDetail', { task: item })}>
+                <View style={styles.cardHeader}>
+                    <View style={[styles.iconContainer, { backgroundColor: item.status === 'Completed' ? '#E8F5E9' : '#E3F2FD' }]}>
+                        <MaterialCommunityIcons
+                            name={item.status === 'Completed' ? 'check-circle' : item.icon}
+                            size={24}
+                            color={item.status === 'Completed' ? Colors.success : ICON_COLOR}
+                        />
+                    </View>
+                    <View style={styles.headerInfo}>
+                        <View style={styles.typeRow}>
+                            <Text style={styles.typeText}>{item.type}</Text>
+                            {item.status === 'Pending' && <Text style={styles.pendingTag}>• Pending</Text>}
+                        </View>
+                        <Text variant="titleMedium" style={styles.cardTitle}>{item.title}</Text>
+                    </View>
+                    <View style={styles.pointsBadge}>
+                        <Text style={styles.pointsValue}>+{item.points}</Text>
+                    </View>
+                </View>
+
+                <Text variant="bodySmall" style={styles.description} numberOfLines={2}>{item.description}</Text>
+
+                <View style={styles.cardFooter}>
+                    <Text style={styles.metaText}>
+                        {item.status === 'Completed' ? 'Completed today' : 'Expires in 24h'}
+                    </Text>
+
+                    {item.status !== 'Completed' && (
+                        <TouchableOpacity onPress={() => navigation.navigate('TaskDetail', { task: item })}>
+                            <View style={styles.actionButton}>
+                                <Text style={styles.actionButtonText}>Start Task</Text>
+                                <MaterialCommunityIcons name="arrow-right" size={16} color={Colors.white} />
+                            </View>
+                        </TouchableOpacity>
+                    )}
+                </View>
+            </Surface>
+        </Animated.View>
+    );
+};
+
 export default function TasksScreen({ navigation }) {
     const [searchQuery, setSearchQuery] = useState('');
     const [filter, setFilter] = useState('All');
@@ -23,47 +88,6 @@ export default function TasksScreen({ navigation }) {
     const filteredTasks = TASKS.filter(task =>
         task.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
         (filter === 'All' || task.status === filter)
-    );
-
-    const renderItem = ({ item }) => (
-        <Surface style={styles.card} elevation={1} onPress={() => navigation.navigate('TaskDetail', { task: item })}>
-            <View style={styles.cardHeader}>
-                <View style={[styles.iconContainer, { backgroundColor: item.status === 'Completed' ? '#E8F5E9' : '#E3F2FD' }]}>
-                    <MaterialCommunityIcons
-                        name={item.status === 'Completed' ? 'check-circle' : item.icon}
-                        size={24}
-                        color={item.status === 'Completed' ? Colors.success : ICON_COLOR}
-                    />
-                </View>
-                <View style={styles.headerInfo}>
-                    <View style={styles.typeRow}>
-                        <Text style={styles.typeText}>{item.type}</Text>
-                        {item.status === 'Pending' && <Text style={styles.pendingTag}>• Pending</Text>}
-                    </View>
-                    <Text variant="titleMedium" style={styles.cardTitle}>{item.title}</Text>
-                </View>
-                <View style={styles.pointsBadge}>
-                    <Text style={styles.pointsValue}>+{item.points}</Text>
-                </View>
-            </View>
-
-            <Text variant="bodySmall" style={styles.description} numberOfLines={2}>{item.description}</Text>
-
-            <View style={styles.cardFooter}>
-                <Text style={styles.metaText}>
-                    {item.status === 'Completed' ? 'Completed today' : 'Expires in 24h'}
-                </Text>
-
-                {item.status !== 'Completed' && (
-                    <TouchableOpacity onPress={() => navigation.navigate('TaskDetail', { task: item })}>
-                        <View style={styles.actionButton}>
-                            <Text style={styles.actionButtonText}>Start Task</Text>
-                            <MaterialCommunityIcons name="arrow-right" size={16} color={Colors.white} />
-                        </View>
-                    </TouchableOpacity>
-                )}
-            </View>
-        </Surface>
     );
 
     return (
@@ -105,7 +129,7 @@ export default function TasksScreen({ navigation }) {
             <FlatList
                 data={filteredTasks}
                 keyExtractor={item => item.id}
-                renderItem={renderItem}
+                renderItem={({ item, index }) => <TaskItem item={item} index={index} navigation={navigation} />}
                 contentContainerStyle={styles.listContent}
                 showsVerticalScrollIndicator={false}
                 ListEmptyComponent={

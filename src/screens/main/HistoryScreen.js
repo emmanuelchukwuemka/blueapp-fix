@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, StyleSheet, FlatList, TouchableOpacity, Animated } from 'react-native';
 import { Text, SegmentedButtons, Surface } from 'react-native-paper';
 import { Colors, Spacing } from '../../constants/colors';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -15,33 +15,60 @@ const HISTORY = [
     { id: '6', title: 'Mobile Data', points: '-200', date: '08 Oct, 05:45 PM', type: 'redeem', icon: 'wifi' },
 ];
 
-export default function HistoryScreen() {
-    const [tab, setTab] = useState('gained');
+const HistoryItem = ({ item, index, tab, navigation }) => {
+    const fadeAnim = useRef(new Animated.Value(0)).current;
+    const slideAnim = useRef(new Animated.Value(20)).current;
 
-    const renderItem = ({ item }) => (
-        <Surface style={styles.card} elevation={1}>
-            <View style={[styles.iconContainer, { backgroundColor: item.type === 'gain' ? '#E3F2FD' : '#FFEBEE' }]}>
-                <MaterialCommunityIcons
-                    name={item.icon}
-                    size={24}
-                    color={ICON_COLOR}
-                />
-            </View>
-            <View style={styles.contentContainer}>
-                <Text variant="titleMedium" style={styles.itemTitle}>{item.title}</Text>
-                <Text variant="bodySmall" style={styles.itemDate}>{item.date}</Text>
-            </View>
-            <Text
-                variant="titleMedium"
-                style={[
-                    styles.points,
-                    { color: item.type === 'gain' ? Colors.success : Colors.error }
-                ]}
-            >
-                {item.points}
-            </Text>
-        </Surface>
+    useEffect(() => {
+        Animated.parallel([
+            Animated.timing(fadeAnim, {
+                toValue: 1,
+                duration: 500,
+                delay: index * 50,
+                useNativeDriver: true,
+            }),
+            Animated.spring(slideAnim, {
+                toValue: 0,
+                friction: 7,
+                delay: index * 50,
+                useNativeDriver: true,
+            })
+        ]).start();
+    }, [tab]);
+
+    return (
+        <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
+            <TouchableOpacity onPress={() => navigation.navigate('TransactionDetail', { item })} activeOpacity={0.9}>
+                <Surface style={styles.card} elevation={1}>
+                    <View style={[styles.iconContainer, { backgroundColor: item.type === 'gain' ? '#E3F2FD' : '#FFEBEE' }]}>
+                        <MaterialCommunityIcons
+                            name={item.icon}
+                            size={24}
+                            color={ICON_COLOR}
+                        />
+                    </View>
+                    <View style={styles.contentContainer}>
+                        <Text variant="titleMedium" style={styles.itemTitle}>{item.title}</Text>
+                        <Text variant="bodySmall" style={styles.itemDate}>{item.date}</Text>
+                    </View>
+                    <Text
+                        variant="titleMedium"
+                        style={[
+                            styles.points,
+                            { color: item.type === 'gain' ? Colors.success : Colors.error }
+                        ]}
+                    >
+                        {item.points}
+                    </Text>
+                    <MaterialCommunityIcons name="chevron-right" size={20} color={Colors.disabled} style={{ marginLeft: 8 }} />
+                </Surface>
+            </TouchableOpacity>
+        </Animated.View>
     );
+};
+
+export default function HistoryScreen({ navigation }) {
+    const [tab, setTab] = useState('gained');
 
     return (
         <View style={styles.container}>
@@ -77,7 +104,7 @@ export default function HistoryScreen() {
             <FlatList
                 data={HISTORY.filter(h => tab === 'gained' ? h.type === 'gain' : h.type === 'redeem')}
                 keyExtractor={item => item.id}
-                renderItem={renderItem}
+                renderItem={({ item, index }) => <HistoryItem item={item} index={index} tab={tab} navigation={navigation} />}
                 contentContainerStyle={styles.listContent}
                 showsVerticalScrollIndicator={false}
                 ListEmptyComponent={

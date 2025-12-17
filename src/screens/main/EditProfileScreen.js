@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { TextInput, Button, Avatar, Text } from 'react-native-paper';
+import React, { useState } from 'react';
+import { View, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, Dimensions } from 'react-native';
+import { TextInput, Button, Avatar, Text, Surface } from 'react-native-paper';
 import { Colors, Spacing } from '../../constants/colors';
 import * as ImagePicker from 'expo-image-picker';
 import { useUser } from '../../context/UserContext';
+import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+const { width } = Dimensions.get('window');
 
 export default function EditProfileScreen({ navigation }) {
     const { user, updateUser } = useUser();
@@ -31,64 +35,169 @@ export default function EditProfileScreen({ navigation }) {
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-            <View style={styles.avatarContainer}>
-                <TouchableOpacity onPress={pickImage}>
-                    {image ? (
-                        <Avatar.Image size={100} source={{ uri: image }} />
-                    ) : (
-                        <Avatar.Text size={100} label={name ? name.substring(0, 2).toUpperCase() : 'BP'} />
-                    )}
-                </TouchableOpacity>
-                <Button mode="text" onPress={pickImage}>Change Photo</Button>
-            </View>
+        <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={{ flex: 1 }}
+        >
+            <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+                {/* Header Section */}
+                <View style={styles.headerContainer}>
+                    <LinearGradient
+                        colors={[Colors.primary, '#0B0B5C']}
+                        style={styles.gradientHeader}
+                    >
+                        <View style={styles.headerContent}>
+                            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                                <MaterialCommunityIcons name="arrow-left" size={24} color={Colors.white} />
+                            </TouchableOpacity>
+                            <Text variant="headlineSmall" style={styles.headerTitle}>Edit Profile</Text>
+                            <View style={{ width: 30 }} />
+                        </View>
+                    </LinearGradient>
+                </View>
 
-            <TextInput
-                label="Full Name"
-                value={name}
-                onChangeText={setName}
-                mode="outlined"
-                style={styles.input}
-            />
-            <TextInput
-                label="Email Address"
-                value={email}
-                onChangeText={setEmail}
-                mode="outlined"
-                style={styles.input}
-                keyboardType="email-address"
-            />
-            <TextInput
-                label="Phone Number"
-                value={phone}
-                onChangeText={setPhone}
-                mode="outlined"
-                style={styles.input}
-                keyboardType="phone-pad"
-            />
+                <View style={styles.contentWrapper}>
+                    {/* Avatar Upload */}
+                    <View style={styles.avatarWrapper}>
+                        <TouchableOpacity onPress={pickImage} style={styles.avatarContainer}>
+                            {image ? (
+                                <Avatar.Image size={110} source={{ uri: image }} style={{ backgroundColor: Colors.surface }} />
+                            ) : (
+                                <Avatar.Text size={110} label={name ? name.substring(0, 2).toUpperCase() : 'BP'} style={{ backgroundColor: Colors.primary }} />
+                            )}
+                            <Surface style={styles.editBadge} elevation={2}>
+                                <MaterialCommunityIcons name="camera" size={20} color={Colors.primary} />
+                            </Surface>
+                        </TouchableOpacity>
+                        <Text style={styles.changePhotoText}>Tap to change photo</Text>
+                    </View>
 
-            <Button mode="contained" onPress={handleSave} style={styles.button}>
-                Save Changes
-            </Button>
-        </ScrollView>
+                    {/* Form Fields */}
+                    <Surface style={styles.formCard} elevation={1}>
+                        <TextInput
+                            label="Full Name"
+                            value={name}
+                            onChangeText={setName}
+                            mode="outlined"
+                            style={styles.input}
+                            outlineColor={Colors.border}
+                            activeOutlineColor={Colors.primary}
+                            left={<TextInput.Icon icon="account" color={Colors.textSecondary} />}
+                        />
+                        <TextInput
+                            label="Email Address"
+                            value={email}
+                            onChangeText={setEmail}
+                            mode="outlined"
+                            style={styles.input}
+                            outlineColor={Colors.border}
+                            activeOutlineColor={Colors.primary}
+                            keyboardType="email-address"
+                            left={<TextInput.Icon icon="email" color={Colors.textSecondary} />}
+                        />
+                        <TextInput
+                            label="Phone Number"
+                            value={phone}
+                            onChangeText={setPhone}
+                            mode="outlined"
+                            style={styles.input}
+                            outlineColor={Colors.border}
+                            activeOutlineColor={Colors.primary}
+                            keyboardType="phone-pad"
+                            left={<TextInput.Icon icon="phone" color={Colors.textSecondary} />}
+                        />
+
+                        <Button
+                            mode="contained"
+                            onPress={handleSave}
+                            style={styles.saveBtn}
+                            contentStyle={{ paddingVertical: 8 }}
+                            icon="content-save-outline"
+                        >
+                            Save Changes
+                        </Button>
+                    </Surface>
+                </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flexGrow: 1,
-        padding: Spacing.m,
-        backgroundColor: Colors.background,
+        flex: 1,
+        backgroundColor: '#F7F9FC',
+    },
+    headerContainer: {
+        height: 150, // Slightly shorter for sub-screens
+        backgroundColor: Colors.primary,
+        borderBottomLeftRadius: 30,
+        borderBottomRightRadius: 30,
+        zIndex: 1
+    },
+    gradientHeader: {
+        flex: 1,
+        borderBottomLeftRadius: 30,
+        borderBottomRightRadius: 30,
+        paddingHorizontal: Spacing.m,
+        paddingTop: 50,
+        justifyContent: 'flex-start',
+    },
+    headerContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+    },
+    backButton: {
+        padding: 8,
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        borderRadius: 12
+    },
+    headerTitle: {
+        color: Colors.white,
+        fontWeight: 'bold',
+        fontSize: 20
+    },
+    contentWrapper: {
+        paddingHorizontal: Spacing.m,
+        marginTop: -50,
+        zIndex: 2,
+        marginBottom: 20
+    },
+    avatarWrapper: {
+        alignItems: 'center',
+        marginBottom: 20
     },
     avatarContainer: {
-        alignItems: 'center',
-        marginBottom: Spacing.l
+        position: 'relative',
+        marginBottom: 10
+    },
+    editBadge: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        backgroundColor: Colors.white,
+        borderRadius: 20,
+        padding: 8,
+    },
+    changePhotoText: {
+        color: Colors.textSecondary,
+        fontSize: 12,
+        fontWeight: '600'
+    },
+    formCard: {
+        backgroundColor: Colors.white,
+        borderRadius: 24,
+        padding: 24,
     },
     input: {
-        marginBottom: Spacing.m,
-        backgroundColor: Colors.surface
+        backgroundColor: Colors.white,
+        marginBottom: 16,
     },
-    button: {
-        marginTop: Spacing.m
+    saveBtn: {
+        marginTop: 10,
+        borderRadius: 12,
+        backgroundColor: Colors.primary,
+        elevation: 2
     }
 });

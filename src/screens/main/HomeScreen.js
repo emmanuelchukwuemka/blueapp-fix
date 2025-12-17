@@ -1,6 +1,6 @@
-import React from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground } from 'react-native';
-import { Text, Surface, Avatar, IconButton } from 'react-native-paper';
+import React, { useEffect, useRef } from 'react';
+import { View, StyleSheet, ScrollView, TouchableOpacity, ImageBackground, Animated } from 'react-native';
+import { Text, Surface, Avatar } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, Spacing } from '../../constants/colors';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -11,6 +11,47 @@ const ACTION_ICONS_COLOR = '#5B9FFF';
 export default function HomeScreen({ navigation }) {
     const { user } = useUser();
 
+    // Animation Values
+    const fadeHeader = useRef(new Animated.Value(0)).current;
+    const slideCard = useRef(new Animated.Value(50)).current; // Start 50px down
+    const fadeCard = useRef(new Animated.Value(0)).current;
+    const slideActions = useRef(new Animated.Value(50)).current;
+    const fadeActions = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        Animated.stagger(100, [
+            Animated.timing(fadeHeader, {
+                toValue: 1,
+                duration: 600,
+                useNativeDriver: true,
+            }),
+            Animated.parallel([
+                Animated.timing(fadeCard, {
+                    toValue: 1,
+                    duration: 600,
+                    useNativeDriver: true,
+                }),
+                Animated.spring(slideCard, {
+                    toValue: 0,
+                    friction: 8,
+                    useNativeDriver: true,
+                })
+            ]),
+            Animated.parallel([
+                Animated.timing(fadeActions, {
+                    toValue: 1,
+                    duration: 600,
+                    useNativeDriver: true,
+                }),
+                Animated.spring(slideActions, {
+                    toValue: 0,
+                    friction: 7,
+                    useNativeDriver: true,
+                })
+            ])
+        ]).start();
+    }, []);
+
     return (
         <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
             {/* Header Section with Curve */}
@@ -19,7 +60,7 @@ export default function HomeScreen({ navigation }) {
                     colors={[Colors.primary, '#0B0B5C']}
                     style={styles.gradientHeader}
                 >
-                    <View style={styles.headerContent}>
+                    <Animated.View style={[styles.headerContent, { opacity: fadeHeader }]}>
                         <View>
                             <Text style={styles.welcomeText}>Welcome back,</Text>
                             <Text variant="headlineMedium" style={styles.nameText}>
@@ -39,46 +80,48 @@ export default function HomeScreen({ navigation }) {
                                 )}
                             </TouchableOpacity>
                         </View>
-                    </View>
+                    </Animated.View>
                 </LinearGradient>
             </View>
 
             {/* Floating Points Card */}
             <View style={styles.cardContainer}>
-                <Surface style={styles.pointsCard} elevation={4}>
-                    <LinearGradient
-                        colors={[Colors.primary, Colors.secondary]}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={styles.gradientCard}
-                    >
-                        <ImageBackground
-                            source={require('../../../assets/splash images/earn.jpg')}
-                            imageStyle={{ opacity: 0.1 }}
-                            style={StyleSheet.absoluteFill}
-                        />
-                        <View style={styles.cardContent}>
-                            <View>
-                                <Text style={styles.cardLabel}>Total Balance</Text>
-                                <Text style={styles.pointsValue}>12,450 <Text style={styles.ptsUnit}>PTS</Text></Text>
+                <Animated.View style={{ opacity: fadeCard, transform: [{ translateY: slideCard }] }}>
+                    <Surface style={styles.pointsCard} elevation={4}>
+                        <LinearGradient
+                            colors={[Colors.primary, Colors.secondary]}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
+                            style={styles.gradientCard}
+                        >
+                            <ImageBackground
+                                source={require('../../../assets/splash images/earn.jpg')}
+                                imageStyle={{ opacity: 0.1 }}
+                                style={StyleSheet.absoluteFill}
+                            />
+                            <View style={styles.cardContent}>
+                                <View>
+                                    <Text style={styles.cardLabel}>Total Balance</Text>
+                                    <Text style={styles.pointsValue}>12,450 <Text style={styles.ptsUnit}>PTS</Text></Text>
+                                </View>
+                                <View style={styles.refreshButton}>
+                                    <MaterialCommunityIcons name="refresh" size={24} color="white" />
+                                </View>
                             </View>
-                            <View style={styles.refreshButton}>
-                                <MaterialCommunityIcons name="refresh" size={24} color="white" />
+                            <View style={styles.cardFooter}>
+                                <Text style={styles.footerText}>Updated just now</Text>
+                                <View style={styles.levelBadge}>
+                                    <MaterialCommunityIcons name="crown" size={14} color="#FFD700" style={{ marginRight: 4 }} />
+                                    <Text style={styles.levelText}>Gold Member</Text>
+                                </View>
                             </View>
-                        </View>
-                        <View style={styles.cardFooter}>
-                            <Text style={styles.footerText}>Updated just now</Text>
-                            <View style={styles.levelBadge}>
-                                <MaterialCommunityIcons name="crown" size={14} color="#FFD700" style={{ marginRight: 4 }} />
-                                <Text style={styles.levelText}>Gold Member</Text>
-                            </View>
-                        </View>
-                    </LinearGradient>
-                </Surface>
+                        </LinearGradient>
+                    </Surface>
+                </Animated.View>
             </View>
 
             {/* Quick Actions */}
-            <View style={styles.section}>
+            <Animated.View style={[styles.section, { opacity: fadeActions, transform: [{ translateY: slideActions }] }]}>
                 <Text style={styles.sectionTitle}>Quick Actions</Text>
                 <View style={styles.actionsGrid}>
                     <QuickAction
@@ -110,10 +153,10 @@ export default function HomeScreen({ navigation }) {
                         onPress={() => navigation.navigate('Redeem', { screen: 'Code' })}
                     />
                 </View>
-            </View>
+            </Animated.View>
 
             {/* Recent Activity */}
-            <View style={styles.section}>
+            <Animated.View style={[styles.section, { opacity: fadeActions, transform: [{ translateY: slideActions }] }]}>
                 <View style={styles.sectionHeader}>
                     <Text style={styles.sectionTitle}>Recent Activity</Text>
                     <TouchableOpacity onPress={() => navigation.navigate('History')}>
@@ -144,7 +187,7 @@ export default function HomeScreen({ navigation }) {
                         time="Yesterday"
                     />
                 </View>
-            </View>
+            </Animated.View>
 
             <View style={{ height: 20 }} />
         </ScrollView>
