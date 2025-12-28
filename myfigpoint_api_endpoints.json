@@ -1,0 +1,371 @@
+{
+  "baseUrl": "http://72.62.4.119/api",
+  "apiInfo": {
+    "name": "MyFigPoint API",
+    "version": "1.0.0",
+    "description": "Backend API for MyFigPoint application deployed at 72.62.4.119"
+  },
+  "endpoints": {
+    "authentication": {
+      "login": {
+        "method": "POST",
+        "url": "/auth/login",
+        "description": "User login",
+        "requiresAuth": false,
+        "requestBody": {
+          "email": "string",
+          "password": "string"
+        },
+        "response": {
+          "token": "string",
+          "user": "object"
+        }
+      },
+      "signup": {
+        "method": "POST",
+        "url": "/auth/signup",
+        "description": "User registration",
+        "requiresAuth": false,
+        "requestBody": {
+          "full_name": "string",
+          "email": "string",
+          "password": "string",
+          "phone": "string"
+        },
+        "response": {
+          "message": "string",
+          "user": "object"
+        }
+      },
+      "forgotPassword": {
+        "method": "POST",
+        "url": "/auth/forgot-password",
+        "description": "Forgot password",
+        "requiresAuth": false,
+        "requestBody": {
+          "email": "string"
+        },
+        "response": {
+          "message": "string"
+        }
+      },
+      "resetPassword": {
+        "method": "POST",
+        "url": "/auth/reset-password",
+        "description": "Reset password",
+        "requiresAuth": false,
+        "requestBody": {
+          "token": "string",
+          "new_password": "string"
+        },
+        "response": {
+          "message": "string"
+        }
+      }
+    },
+    "user": {
+      "getProfile": {
+        "method": "GET",
+        "url": "/users/profile",
+        "description": "Get user profile",
+        "requiresAuth": true,
+        "response": {
+          "user": "object"
+        }
+      },
+      "updateProfile": {
+        "method": "PUT",
+        "url": "/users/profile",
+        "description": "Update user profile",
+        "requiresAuth": true,
+        "requestBody": {
+          "full_name": "string",
+          "phone": "string",
+          "bank_name": "string",
+          "account_name": "string",
+          "account_number": "string"
+        },
+        "response": {
+          "message": "string",
+          "user": "object"
+        }
+      },
+      "getUsers": {
+        "method": "GET",
+        "url": "/users/",
+        "description": "Get users list (admin only)",
+        "requiresAuth": true,
+        "adminOnly": true,
+        "response": {
+          "users": "array"
+        }
+      }
+    },
+    "points": {
+      "getBalance": {
+        "method": "GET",
+        "url": "/points/balance",
+        "description": "Get user's points balance",
+        "requiresAuth": true,
+        "response": {
+          "balance": "number",
+          "total_earned": "number",
+          "total_withdrawn": "number"
+        }
+      },
+      "getHistory": {
+        "method": "GET",
+        "url": "/points/history",
+        "description": "Get points history",
+        "requiresAuth": true,
+        "response": {
+          "history": "array"
+        }
+      }
+    },
+    "codes": {
+      "getCodes": {
+        "method": "GET",
+        "url": "/codes/",
+        "description": "Get available codes",
+        "requiresAuth": true,
+        "response": {
+          "codes": "array"
+        }
+      },
+      "redeemCode": {
+        "method": "POST",
+        "url": "/codes/redeem",
+        "description": "Redeem a code",
+        "requiresAuth": true,
+        "requestBody": {
+          "code": "string"
+        },
+        "response": {
+          "message": "string",
+          "points_awarded": "number"
+        }
+      }
+    },
+    "transactions": {
+      "getHistory": {
+        "method": "GET",
+        "url": "/transactions/",
+        "description": "Get transaction history",
+        "requiresAuth": true,
+        "response": {
+          "transactions": "array"
+        }
+      }
+    },
+    "referrals": {
+      "getReferrals": {
+        "method": "GET",
+        "url": "/referrals/",
+        "description": "Get referral information",
+        "requiresAuth": true,
+        "response": {
+          "referrals": "array",
+          "referral_code": "string",
+          "referral_count": "number",
+          "total_earnings": "number"
+        }
+      }
+    },
+    "tasks": {
+      "getTasks": {
+        "method": "GET",
+        "url": "/tasks/",
+        "description": "Get available tasks",
+        "requiresAuth": true,
+        "response": {
+          "tasks": "array",
+          "total": "number",
+          "pages": "number",
+          "current_page": "number"
+        }
+      },
+      "startTask": {
+        "method": "POST",
+        "url": "/tasks/{task_id}/start",
+        "description": "Start a task",
+        "requiresAuth": true,
+        "requestBody": {},
+        "response": {
+          "message": "string",
+          "task": "object",
+          "user_task": "object"
+        }
+      },
+      "completeTask": {
+        "method": "POST",
+        "url": "/tasks/{task_id}/complete",
+        "description": "Complete a task",
+        "requiresAuth": true,
+        "requestBody": {
+          "proof_text": "string",
+          "proof_image": "string"
+        },
+        "response": {
+          "message": "string",
+          "points_awarded": "number",
+          "reward_awarded": "number",
+          "new_points_balance": "number",
+          "new_total_earnings": "number"
+        }
+      }
+    },
+    "notifications": {
+      "getNotifications": {
+        "method": "GET",
+        "url": "/notifications/",
+        "description": "Get user notifications",
+        "requiresAuth": true,
+        "response": {
+          "notifications": "array"
+        }
+      },
+      "createNotification": {
+        "method": "POST",
+        "url": "/notifications/",
+        "description": "Create notification",
+        "requiresAuth": true,
+        "requestBody": {
+          "title": "string",
+          "message": "string",
+          "type": "string"
+        },
+        "response": {
+          "message": "string",
+          "notification": "object"
+        }
+      }
+    },
+    "support": {
+      "getTickets": {
+        "method": "GET",
+        "url": "/support/tickets",
+        "description": "Get support tickets",
+        "requiresAuth": true,
+        "response": {
+          "tickets": "array"
+        }
+      },
+      "createTicket": {
+        "method": "POST",
+        "url": "/support/tickets",
+        "description": "Create a support ticket",
+        "requiresAuth": true,
+        "requestBody": {
+          "subject": "string",
+          "message": "string",
+          "category": "string"
+        },
+        "response": {
+          "message": "string",
+          "ticket": "object"
+        }
+      }
+    },
+    "partners": {
+      "getPartners": {
+        "method": "GET",
+        "url": "/partners/",
+        "description": "Get partner information",
+        "requiresAuth": true,
+        "response": {
+          "partners": "array"
+        }
+      },
+      "registerPartner": {
+        "method": "POST",
+        "url": "/partners/",
+        "description": "Partner registration",
+        "requiresAuth": true,
+        "requestBody": {
+          "business_name": "string",
+          "business_type": "string",
+          "contact_info": "string"
+        },
+        "response": {
+          "message": "string",
+          "partner": "object"
+        }
+      }
+    },
+    "admin": {
+      "getUsers": {
+        "method": "GET",
+        "url": "/admin/users",
+        "description": "Get all users (admin only)",
+        "requiresAuth": true,
+        "adminOnly": true,
+        "response": {
+          "users": "array"
+        }
+      },
+      "getTasks": {
+        "method": "GET",
+        "url": "/admin/tasks",
+        "description": "Get all tasks (admin only)",
+        "requiresAuth": true,
+        "adminOnly": true,
+        "response": {
+          "tasks": "array"
+        }
+      },
+      "createTask": {
+        "method": "POST",
+        "url": "/admin/tasks",
+        "description": "Create a task (admin only)",
+        "requiresAuth": true,
+        "adminOnly": true,
+        "requestBody": {
+          "title": "string",
+          "description": "string",
+          "reward_amount": "number",
+          "points_reward": "number",
+          "category": "string",
+          "time_required": "number",
+          "is_active": "boolean",
+          "requires_admin_verification": "boolean"
+        },
+        "response": {
+          "message": "string",
+          "task": "object"
+        }
+      },
+      "updateTask": {
+        "method": "PUT",
+        "url": "/admin/tasks/{task_id}",
+        "description": "Update a task (admin only)",
+        "requiresAuth": true,
+        "adminOnly": true,
+        "requestBody": {
+          "title": "string",
+          "description": "string",
+          "reward_amount": "number",
+          "points_reward": "number",
+          "category": "string",
+          "time_required": "number",
+          "is_active": "boolean",
+          "requires_admin_verification": "boolean"
+        },
+        "response": {
+          "message": "string",
+          "task": "object"
+        }
+      },
+      "deleteTask": {
+        "method": "DELETE",
+        "url": "/admin/tasks/{task_id}",
+        "description": "Delete a task (admin only)",
+        "requiresAuth": true,
+        "adminOnly": true,
+        "response": {
+          "message": "string"
+        }
+      }
+    }
+  }
+}
