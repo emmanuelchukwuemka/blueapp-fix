@@ -15,7 +15,7 @@ export default function SplashScreen({ navigation }) {
     return (
         <View style={styles.container}>
             <Image
-                source={require('../../../assets/logo.png')}
+                source={require('../../../assets/BluePoint1.png')}
                 style={styles.logo}
                 resizeMode="contain"
             />

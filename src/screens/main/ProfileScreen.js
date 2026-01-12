@@ -8,8 +8,22 @@ import apiService from '../../services/api';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function ProfileScreen({ navigation }) {
-    const { user, logout } = useUser();
+    const { user, logout, updateUser } = useUser();
     const [isDarkMode, setIsDarkMode] = React.useState(false);
+    
+    React.useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', async () => {
+            try {
+                // Fetch fresh user data to reflect any admin changes
+                const freshUserData = await apiService.getProfile();
+                updateUser(freshUserData.user);
+            } catch (error) {
+                console.error('Error fetching updated user profile:', error);
+            }
+        });
+        
+        return unsubscribe;
+    }, [navigation, updateUser]);
 
     const MenuItem = ({ icon, title, subtitle, onPress, showChevron = true, isDestructive = false }) => (
         <TouchableOpacity onPress={onPress}>

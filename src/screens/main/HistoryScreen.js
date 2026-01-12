@@ -100,17 +100,12 @@ export default function HistoryScreen({ navigation }) {
             setLoading(true);
             try {
                 const params = {};
-                if (tab === 'gained') {
-                    params.type = 'earning';
-                } else {
-                    params.type = 'point_withdrawal';
-                }
                 
-                const response = await apiService.getTransactionHistory(params);
+                const response = await apiService.getHistory(params);
                 const mappedTransactions = response.transactions.map(mapTransactionToHistoryItem);
                 setTransactions(mappedTransactions);
             } catch (error) {
-                Alert.alert('Error', error.message || 'Failed to load transaction history');
+                Alert.alert('Error', error.message || 'Failed to load history');
                 console.error('Error fetching transactions:', error);
             } finally {
                 setLoading(false);
@@ -121,11 +116,37 @@ export default function HistoryScreen({ navigation }) {
             fetchTransactions();
         }
     }, [tab, user]);
+    
+    // Refresh data when coming back to the screen
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            if (user?.isLoggedIn) {
+                const fetchTransactions = async () => {
+                    setLoading(true);
+                    try {
+                        const params = {};
+                        
+                        const response = await apiService.getHistory(params);
+                        const mappedTransactions = response.transactions.map(mapTransactionToHistoryItem);
+                        setTransactions(mappedTransactions);
+                    } catch (error) {
+                        Alert.alert('Error', error.message || 'Failed to load history');
+                        console.error('Error fetching transactions:', error);
+                    } finally {
+                        setLoading(false);
+                    }
+                };
+                fetchTransactions();
+            }
+        });
+        
+        return unsubscribe;
+    }, [navigation, user]);
 
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text variant="headlineSmall" style={styles.headerTitle}>Transaction History</Text>
+                <Text variant="headlineSmall" style={styles.headerTitle}>History</Text>
                 <Text variant="bodyMedium" style={styles.headerSubtitle}>Track your earnings and spendings</Text>
             </View>
 
@@ -154,7 +175,13 @@ export default function HistoryScreen({ navigation }) {
             </View>
 
             <FlatList
-                data={transactions.filter(h => tab === 'gained' ? h.type === 'gain' : h.type === 'redeem')}
+                data={transactions.filter(h => {
+                    if (tab === 'gained') {
+                        return ['earning', 'referral_bonus', 'code_redemption'].includes(h.transaction.type);
+                    } else {
+                        return ['point_withdrawal'].includes(h.transaction.type);
+                    }
+                })}
                 keyExtractor={item => item.id}
                 renderItem={({ item, index }) => <HistoryItem item={item} index={index} tab={tab} navigation={navigation} />}
                 contentContainerStyle={styles.listContent}
@@ -162,7 +189,7 @@ export default function HistoryScreen({ navigation }) {
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
                         <MaterialCommunityIcons name="history" size={64} color={Colors.disabled} />
-                        <Text style={styles.emptyText}>No transactions found.</Text>
+                        <Text style={styles.emptyText}>No history found.</Text>
                     </View>
                 }
             />

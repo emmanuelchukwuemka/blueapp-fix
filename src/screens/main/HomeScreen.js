@@ -27,6 +27,25 @@ export default function HomeScreen({ navigation }) {
             fetchPointsBalance();
         }
     }, [user]);
+    
+    // Refresh data when coming back to the screen
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            if (user?.isLoggedIn) {
+                const fetchPointsBalance = async () => {
+                    try {
+                        const response = await apiService.getPointsBalance();
+                        setPointsBalance(response.points_balance);
+                    } catch (error) {
+                        console.error('Error fetching points balance:', error);
+                    }
+                };
+                fetchPointsBalance();
+            }
+        });
+        
+        return unsubscribe;
+    }, [navigation, user]);
 
     // Animation Values
     const fadeHeader = useRef(new Animated.Value(0)).current;
@@ -118,7 +137,7 @@ export default function HomeScreen({ navigation }) {
                             />
                             <View style={styles.cardContent}>
                                 <View>
-                                    <Text style={styles.cardLabel}>Total Balance</Text>
+                                    <Text style={styles.cardLabel}>Point Balance</Text>
                                     <Text style={styles.pointsValue}>{pointsBalance.toLocaleString()} <Text style={styles.ptsUnit}>PTS</Text></Text>
                                 </View>
                                 <View style={styles.refreshButton}>
@@ -183,25 +202,11 @@ export default function HomeScreen({ navigation }) {
 
                 <View style={styles.activityList}>
                     <ActivityCard
-                        title="Daily Login"
-                        subtitle="Reward for login"
-                        points="+50"
+                        title="Welcome!"
+                        subtitle="Start completing tasks"
+                        points="+0"
                         isGain
-                        time="10:00 AM"
-                    />
-                    <ActivityCard
-                        title="Amazon Gift Card"
-                        subtitle="Redeemed reward"
-                        points="-500"
-                        isGain={false}
-                        time="Yesterday"
-                    />
-                    <ActivityCard
-                        title="Profile Completion"
-                        subtitle="One-time bonus"
-                        points="+200"
-                        isGain
-                        time="Yesterday"
+                        time="Today"
                     />
                 </View>
             </Animated.View>

@@ -14,6 +14,7 @@ import ChangePasswordScreen from '../screens/main/ChangePasswordScreen';
 import TransactionDetailScreen from '../screens/main/TransactionDetailScreen';
 import ReferralScreen from '../screens/main/ReferralScreen';
 import SupportTicketScreen from '../screens/main/SupportTicketScreen';
+import PrivacyPolicyScreen from '../screens/main/PrivacyPolicyScreen';
 import DebugScreen from '../screens/DebugScreen';
 
 const Stack = createNativeStackNavigator();
@@ -38,6 +39,7 @@ export default function AppNavigator() {
                 <Stack.Screen name="Security" component={SecurityScreen} options={{ headerShown: true, title: 'Security' }} />
                 <Stack.Screen name="HelpCenter" component={HelpCenterScreen} options={{ headerShown: true, title: 'Help Center' }} />
                 <Stack.Screen name="TermsPrivacy" component={TermsPrivacyScreen} options={{ headerShown: true, title: 'Terms & Privacy' }} />
+                <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} options={{ headerShown: true, title: 'Privacy Policy' }} />
                 <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="TransactionDetail" component={TransactionDetailScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="Referral" component={ReferralScreen} options={{ headerShown: false }} />

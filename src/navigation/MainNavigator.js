@@ -46,6 +46,7 @@ export default function MainNavigator() {
             <Tab.Screen name="Redeem" component={RedeemScreen} />
             <Tab.Screen name="History" component={HistoryScreen} />
             <Tab.Screen name="Profile" component={ProfileScreen} />
+
         </Tab.Navigator>
     );
 }

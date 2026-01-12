@@ -1,0 +1,1694 @@
+{
+  "api_documentation": {
+    "title": "MyFigPoint API Documentation",
+    "version": "1.0.0",
+    "description": "Complete API documentation for MyFigPoint application",
+    "base_url": "http://72.62.4.119:8000/api",
+    "endpoints": {
+      "auth": {
+        "prefix": "/api/auth",
+        "routes": [
+          {
+            "endpoint": "/register",
+            "method": "POST",
+            "description": "Register a new user account",
+            "auth_required": false,
+            "parameters": {
+              "full_name": "string (required)",
+              "email": "string (required)",
+              "password": "string (required)",
+              "role": "string (optional, default: user)",
+              "referral_code": "string (optional)"
+            },
+            "responses": {
+              "201": "User registered successfully with access token",
+              "400": "Validation error",
+              "409": "Email already registered",
+              "500": "Registration failed"
+            }
+          },
+          {
+            "endpoint": "/login",
+            "method": "POST",
+            "description": "Authenticate user and return access token",
+            "auth_required": false,
+            "parameters": {
+              "email": "string (required)",
+              "password": "string (required)"
+            },
+            "responses": {
+              "200": "Login successful with access token",
+              "400": "Email and password required",
+              "401": "Invalid credentials",
+              "500": "Login failed"
+            }
+          },
+          {
+            "endpoint": "/profile",
+            "method": "GET",
+            "description": "Get current user profile information",
+            "auth_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "User profile data",
+              "404": "User not found",
+              "500": "Failed to fetch profile"
+            }
+          },
+          {
+            "endpoint": "/forgot-password",
+            "method": "POST",
+            "description": "Request password reset email",
+            "auth_required": false,
+            "parameters": {
+              "email": "string (required)"
+            },
+            "responses": {
+              "200": "Password reset email sent",
+              "400": "Email required",
+              "500": "Failed to process password reset request"
+            }
+          },
+          {
+            "endpoint": "/reset-password",
+            "method": "POST",
+            "description": "Reset user password using token",
+            "auth_required": false,
+            "parameters": {
+              "token": "string (required)",
+              "password": "string (required, min 6 chars)"
+            },
+            "responses": {
+              "200": "Password reset successfully",
+              "400": "Token and password required",
+              "400": "Invalid or expired token",
+              "500": "Failed to reset password"
+            }
+          },
+          {
+            "endpoint": "/google",
+            "method": "GET",
+            "description": "Google OAuth login endpoint (placeholder)",
+            "auth_required": false,
+            "parameters": {},
+            "responses": {
+              "200": "Google login endpoint info"
+            }
+          },
+          {
+            "endpoint": "/apple",
+            "method": "GET",
+            "description": "Apple OAuth login endpoint (placeholder)",
+            "auth_required": false,
+            "parameters": {},
+            "responses": {
+              "200": "Apple login endpoint info"
+            }
+          },
+          {
+            "endpoint": "/google/callback",
+            "method": "GET",
+            "description": "Google OAuth callback endpoint (placeholder)",
+            "auth_required": false,
+            "parameters": {},
+            "responses": {
+              "200": "Google OAuth callback info"
+            }
+          },
+          {
+            "endpoint": "/apple/callback",
+            "method": "POST",
+            "description": "Apple OAuth callback endpoint (placeholder)",
+            "auth_required": false,
+            "parameters": {},
+            "responses": {
+              "200": "Apple OAuth callback info"
+            }
+          }
+        ]
+      },
+      "users": {
+        "prefix": "/api/users",
+        "routes": [
+          {
+            "endpoint": "/profile",
+            "method": "GET",
+            "description": "Get current user profile (alternative to auth/profile)",
+            "auth_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "User profile data",
+              "404": "User not found",
+              "500": "Failed to fetch profile"
+            }
+          },
+          {
+            "endpoint": "/profile",
+            "method": "PUT",
+            "description": "Update current user profile",
+            "auth_required": true,
+            "parameters": {
+              "full_name": "string (optional)",
+              "phone": "string (optional)",
+              "bank_name": "string (optional)",
+              "account_name": "string (optional)",
+              "account_number": "string (optional)",
+              "avatar_url": "string (optional)",
+              "country": "string (optional)",
+              "province": "string (optional)",
+              "routing_number": "string (optional)",
+              "swift_code": "string (optional)",
+              "account_type": "string (optional)",
+              "bank_address": "string (optional)"
+            },
+            "responses": {
+              "200": "Profile updated successfully",
+              "404": "User not found",
+              "500": "Failed to update profile"
+            }
+          },
+          {
+            "endpoint": "/change-password",
+            "method": "POST",
+            "description": "Change current user password",
+            "auth_required": true,
+            "parameters": {
+              "current_password": "string (required)",
+              "new_password": "string (required, min 6 chars)"
+            },
+            "responses": {
+              "200": "Password changed successfully",
+              "400": "Current password and new password required",
+              "400": "Current password is incorrect",
+              "500": "Failed to change password"
+            }
+          },
+          {
+            "endpoint": "/admin/<user_id>/role",
+            "method": "PUT",
+            "description": "Update user role (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "role": "string (required: user, admin, partner)"
+            },
+            "responses": {
+              "200": "User role updated successfully",
+              "400": "Role is required or invalid role value",
+              "403": "Access denied",
+              "404": "User not found",
+              "500": "Failed to update user role"
+            }
+          },
+          {
+            "endpoint": "/admin/<user_id>/points",
+            "method": "PUT",
+            "description": "Update user points (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "points": "number (required)",
+              "operation": "string (required: set, add, subtract)"
+            },
+            "responses": {
+              "200": "User points updated successfully",
+              "400": "Invalid operation or insufficient points",
+              "403": "Access denied",
+              "404": "User not found",
+              "500": "Failed to update user points"
+            }
+          },
+          {
+            "endpoint": "/admin/search",
+            "method": "GET",
+            "description": "Search users (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "query": "string (required)",
+              "page": "number (optional, default: 1)",
+              "per_page": "number (optional, default: 20)"
+            },
+            "responses": {
+              "200": "Search results with users",
+              "400": "Search query is required",
+              "403": "Access denied",
+              "500": "Failed to search users"
+            }
+          },
+          {
+            "endpoint": "/admin/<user_id>/suspend",
+            "method": "POST",
+            "description": "Suspend user account (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "User suspended successfully",
+              "403": "Access denied",
+              "404": "User not found",
+              "500": "Failed to suspend user"
+            }
+          },
+          {
+            "endpoint": "/admin/<user_id>/unsuspend",
+            "method": "POST",
+            "description": "Unsuspend user account (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "User suspension lifted successfully",
+              "403": "Access denied",
+              "404": "User not found",
+              "500": "Failed to lift user suspension"
+            }
+          },
+          {
+            "endpoint": "/avatar",
+            "method": "POST",
+            "description": "Upload user avatar",
+            "auth_required": true,
+            "parameters": {
+              "avatar": "file (required, allowed: png, jpg, jpeg, gif, webp)"
+            },
+            "responses": {
+              "200": "Avatar uploaded successfully",
+              "400": "No avatar file provided or invalid file type",
+              "404": "User not found",
+              "500": "Failed to upload avatar"
+            }
+          }
+        ]
+      },
+      "points": {
+        "prefix": "/api/points",
+        "routes": [
+          {
+            "endpoint": "/balance",
+            "method": "GET",
+            "description": "Get current user points balance",
+            "auth_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Points balance information",
+              "404": "User not found",
+              "500": "Failed to fetch points balance"
+            }
+          },
+          {
+            "endpoint": "/history",
+            "method": "GET",
+            "description": "Get user points history",
+            "auth_required": true,
+            "parameters": {
+              "page": "number (optional, default: 1)",
+              "per_page": "number (optional, default: 10)"
+            },
+            "responses": {
+              "200": "Points history",
+              "500": "Failed to fetch points history"
+            }
+          },
+          {
+            "endpoint": "/withdraw",
+            "method": "POST",
+            "description": "Request points withdrawal",
+            "auth_required": true,
+            "parameters": {
+              "points": "number (required)",
+              "method": "string (required: bank, gift_card)",
+              "bank_name": "string (optional)",
+              "account_holder_name": "string (optional)",
+              "account_number": "string (optional)",
+              "save_bank_details": "boolean (optional)",
+              "routing_number": "string (optional)",
+              "gift_card_type": "string (required if method is gift_card)"
+            },
+            "responses": {
+              "200": "Withdrawal request submitted successfully",
+              "400": "Validation errors or insufficient points",
+              "404": "User not found",
+              "500": "Failed to process withdrawal"
+            }
+          },
+          {
+            "endpoint": "/convert",
+            "method": "POST",
+            "description": "Convert points to USD preview",
+            "auth_required": true,
+            "parameters": {
+              "points": "number (required)"
+            },
+            "responses": {
+              "200": "Conversion preview",
+              "400": "Points must be greater than 0",
+              "404": "User not found",
+              "500": "Failed to convert points"
+            }
+          }
+        ]
+      },
+      "codes": {
+        "prefix": "/api/codes",
+        "routes": [
+          {
+            "endpoint": "/redeem",
+            "method": "POST",
+            "description": "Redeem a reward code",
+            "auth_required": true,
+            "parameters": {
+              "code": "string (required, format: 5 uppercase letters + 3 digits)"
+            },
+            "responses": {
+              "200": "Code redeemed successfully",
+              "400": "Invalid code format or code already used",
+              "404": "Invalid code or user not found",
+              "500": "Failed to redeem code"
+            }
+          },
+          {
+            "endpoint": "/history",
+            "method": "GET",
+            "description": "Get user's redemption history",
+            "auth_required": true,
+            "parameters": {
+              "page": "number (optional, default: 1)",
+              "per_page": "number (optional, default: 10)"
+            },
+            "responses": {
+              "200": "Redemption history",
+              "500": "Failed to fetch redemption history"
+            }
+          },
+          {
+            "endpoint": "/validate/<code>",
+            "method": "GET",
+            "description": "Validate a reward code",
+            "auth_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Code validation result",
+              "404": "Invalid code",
+              "500": "Failed to validate code"
+            }
+          },
+          {
+            "endpoint": "/info/<code>",
+            "method": "GET",
+            "description": "Get detailed information about a reward code",
+            "auth_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Code information",
+              "404": "Invalid code",
+              "500": "Failed to get code info"
+            }
+          },
+          {
+            "endpoint": "/admin/all",
+            "method": "GET",
+            "description": "Get all reward codes (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "page": "number (optional, default: 1)",
+              "per_page": "number (optional, default: 50)",
+              "used_only": "boolean (optional, default: false)",
+              "batch_id": "string (optional)"
+            },
+            "responses": {
+              "200": "List of all codes",
+              "403": "Access denied",
+              "500": "Failed to fetch codes"
+            }
+          },
+          {
+            "endpoint": "/admin/<code_id>/delete",
+            "method": "DELETE",
+            "description": "Delete a reward code (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Code deleted successfully",
+              "400": "Cannot delete used codes",
+              "403": "Access denied",
+              "404": "Code not found",
+              "500": "Failed to delete code"
+            }
+          },
+          {
+            "endpoint": "/admin/stats",
+            "method": "GET",
+            "description": "Get reward code statistics (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Code statistics",
+              "403": "Access denied",
+              "500": "Failed to fetch code stats"
+            }
+          }
+        ]
+      },
+      "transactions": {
+        "prefix": "/api/transactions",
+        "routes": [
+          {
+            "endpoint": "/",
+            "method": "GET",
+            "description": "Get user's transaction history",
+            "auth_required": true,
+            "parameters": {
+              "page": "number (optional, default: 1)",
+              "per_page": "number (optional, default: 10)",
+              "type": "string (optional, filter by transaction type)"
+            },
+            "responses": {
+              "200": "Transaction history",
+              "500": "Failed to fetch transactions"
+            }
+          },
+          {
+            "endpoint": "/<transaction_id>",
+            "method": "GET",
+            "description": "Get specific transaction details",
+            "auth_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Transaction details",
+              "404": "Transaction not found",
+              "500": "Failed to fetch transaction"
+            }
+          },
+          {
+            "endpoint": "/admin",
+            "method": "GET",
+            "description": "Get all transactions (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "page": "number (optional, default: 1)",
+              "per_page": "number (optional, default: 20)",
+              "user_id": "number (optional)",
+              "type": "string (optional)"
+            },
+            "responses": {
+              "200": "All transactions",
+              "403": "Access denied",
+              "500": "Failed to fetch transactions"
+            }
+          },
+          {
+            "endpoint": "/admin/<transaction_id>/update-status",
+            "method": "PUT",
+            "description": "Update transaction status (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "status": "string (required: pending, completed, failed)"
+            },
+            "responses": {
+              "200": "Transaction status updated",
+              "400": "Status is required or invalid status value",
+              "403": "Access denied",
+              "404": "Transaction not found",
+              "500": "Failed to update transaction status"
+            }
+          },
+          {
+            "endpoint": "/admin/user/<user_id>",
+            "method": "GET",
+            "description": "Get specific user's transactions (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "page": "number (optional, default: 1)",
+              "per_page": "number (optional, default: 20)"
+            },
+            "responses": {
+              "200": "User's transactions",
+              "403": "Access denied",
+              "500": "Failed to fetch user transactions"
+            }
+          },
+          {
+            "endpoint": "/summary",
+            "method": "GET",
+            "description": "Get transaction summary for current user",
+            "auth_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Transaction summary",
+              "500": "Failed to fetch transaction summary"
+            }
+          }
+        ]
+      },
+      "referrals": {
+        "prefix": "/api/referrals",
+        "routes": [
+          {
+            "endpoint": "/stats",
+            "method": "GET",
+            "description": "Get user's referral statistics",
+            "auth_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Referral statistics",
+              "404": "User not found",
+              "500": "Failed to fetch referral stats"
+            }
+          },
+          {
+            "endpoint": "/admin/all",
+            "method": "GET",
+            "description": "Get all referrals (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "page": "number (optional, default: 1)",
+              "per_page": "number (optional, default: 20)",
+              "search": "string (optional)"
+            },
+            "responses": {
+              "200": "All referrals",
+              "403": "Access denied",
+              "500": "Failed to fetch referrals"
+            }
+          },
+          {
+            "endpoint": "/admin/bonuses",
+            "method": "GET",
+            "description": "Get all referral bonuses (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "page": "number (optional, default: 1)",
+              "per_page": "number (optional, default: 20)"
+            },
+            "responses": {
+              "200": "All referral bonuses",
+              "403": "Access denied",
+              "500": "Failed to fetch referral bonuses"
+            }
+          },
+          {
+            "endpoint": "/admin/top-referrers",
+            "method": "GET",
+            "description": "Get top referrers (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Top referrers",
+              "403": "Access denied",
+              "500": "Failed to fetch top referrers"
+            }
+          },
+          {
+            "endpoint": "/users",
+            "method": "GET",
+            "description": "Get users referred by current user",
+            "auth_required": true,
+            "parameters": {
+              "page": "number (optional, default: 1)",
+              "per_page": "number (optional, default: 10)"
+            },
+            "responses": {
+              "200": "Referred users",
+              "500": "Failed to fetch referred users"
+            }
+          },
+          {
+            "endpoint": "/link",
+            "method": "GET",
+            "description": "Get user's referral link",
+            "auth_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Referral code and link",
+              "404": "User not found",
+              "500": "Failed to generate referral link"
+            }
+          }
+        ]
+      },
+      "admin": {
+        "prefix": "/api/admin",
+        "routes": [
+          {
+            "endpoint": "/codes/generate",
+            "method": "POST",
+            "description": "Generate reward codes (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "count": "number (required, 1-10000)",
+              "point_value": "number (required, > 0)"
+            },
+            "responses": {
+              "201": "Codes generated successfully",
+              "400": "Validation errors",
+              "500": "Failed to generate codes"
+            }
+          },
+          {
+            "endpoint": "/codes/export/<batch_id>",
+            "method": "GET",
+            "description": "Export reward codes (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "format": "string (optional, csv, pdf, word, default: csv)",
+              "search": "string (optional)",
+              "status": "string (optional, available, used)"
+            },
+            "responses": {
+              "200": "Exported codes",
+              "404": "No codes found",
+              "500": "Failed to export codes"
+            }
+          },
+          {
+            "endpoint": "/codes/recent-batch",
+            "method": "GET",
+            "description": "Get most recent batch ID (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Recent batch ID",
+              "404": "No batches found",
+              "500": "Failed to fetch recent batch"
+            }
+          },
+          {
+            "endpoint": "/codes",
+            "method": "GET",
+            "description": "Get all reward codes (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "page": "number (optional, default: 1)",
+              "per_page": "number (optional, default: 50)",
+              "search": "string (optional)",
+              "status": "string (optional, all, available, used)"
+            },
+            "responses": {
+              "200": "All codes",
+              "500": "Failed to fetch codes"
+            }
+          },
+          {
+            "endpoint": "/codes/<code_id>/delete",
+            "method": "DELETE",
+            "description": "Delete single code (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Code deleted successfully",
+              "404": "Code not found",
+              "500": "Failed to delete code"
+            }
+          },
+          {
+            "endpoint": "/codes/<code>/details",
+            "method": "GET",
+            "description": "Get code details (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Code details",
+              "404": "Code not found",
+              "500": "Failed to fetch code details"
+            }
+          },
+          {
+            "endpoint": "/support-messages",
+            "method": "GET",
+            "description": "Get all support messages (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "page": "number (optional, default: 1)",
+              "per_page": "number (optional, default: 20)",
+              "status": "string (optional, all, sent, replied)"
+            },
+            "responses": {
+              "200": "All support messages",
+              "500": "Failed to fetch support messages"
+            }
+          },
+          {
+            "endpoint": "/support-messages/<message_id>/respond",
+            "method": "POST",
+            "description": "Respond to support message (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "response": "string (required)"
+            },
+            "responses": {
+              "200": "Response sent successfully",
+              "400": "Response text is required",
+              "404": "Support message not found",
+              "500": "Failed to respond to support message"
+            }
+          },
+          {
+            "endpoint": "/activities/recent",
+            "method": "GET",
+            "description": "Get recent platform activities (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "limit": "number (optional, default: 20)"
+            },
+            "responses": {
+              "200": "Recent activities",
+              "500": "Failed to fetch recent activities"
+            }
+          },
+          {
+            "endpoint": "/users/points/update",
+            "method": "POST",
+            "description": "Update user points (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "user_id": "number (required)",
+              "points": "number (required)",
+              "operation": "string (required: add, subtract)"
+            },
+            "responses": {
+              "200": "Points updated successfully",
+              "400": "User ID is required or validation errors",
+              "404": "User not found",
+              "500": "Failed to update user points"
+            }
+          },
+          {
+            "endpoint": "/users",
+            "method": "GET",
+            "description": "Get all users (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "page": "number (optional, default: 1)",
+              "per_page": "number (optional, default: 20)",
+              "search": "string (optional)",
+              "role": "string (optional)",
+              "status": "string (optional, active, suspended)"
+            },
+            "responses": {
+              "200": "All users",
+              "500": "Failed to fetch users"
+            }
+          },
+          {
+            "endpoint": "/users/<user_id>/details",
+            "method": "GET",
+            "description": "Get user details (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "User details",
+              "404": "User not found",
+              "500": "Failed to fetch user details"
+            }
+          },
+          {
+            "endpoint": "/users/<user_id>/suspend",
+            "method": "POST",
+            "description": "Suspend user (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "User suspended successfully",
+              "404": "User not found",
+              "500": "Failed to suspend user"
+            }
+          },
+          {
+            "endpoint": "/users/<user_id>/unsuspend",
+            "method": "POST",
+            "description": "Unsuspend user (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "User unsuspended successfully",
+              "404": "User not found",
+              "500": "Failed to unsuspend user"
+            }
+          },
+          {
+            "endpoint": "/users/<user_id>/verify",
+            "method": "POST",
+            "description": "Verify user (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "verified": "boolean (optional, default: true)"
+            },
+            "responses": {
+              "200": "User verification status updated",
+              "404": "User not found",
+              "500": "Failed to verify user"
+            }
+          },
+          {
+            "endpoint": "/users/<user_id>/update",
+            "method": "POST",
+            "description": "Update user details (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "full_name": "string (optional)",
+              "email": "string (optional)",
+              "phone": "string (optional)",
+              "role": "string (optional)",
+              "bank_name": "string (optional)",
+              "account_name": "string (optional)",
+              "account_number": "string (optional)",
+              "routing_number": "string (optional)",
+              "points_balance": "number (optional)",
+              "total_earnings": "number (optional)",
+              "is_verified": "boolean (optional)",
+              "is_suspended": "boolean (optional)",
+              "is_approved": "boolean (optional)"
+            },
+            "responses": {
+              "200": "User updated successfully",
+              "404": "User not found",
+              "500": "Failed to update user"
+            }
+          },
+          {
+            "endpoint": "/users/<user_id>/verify-documents",
+            "method": "POST",
+            "description": "Verify user documents (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Documents verified successfully",
+              "404": "User not found",
+              "500": "Failed to verify documents"
+            }
+          },
+          {
+            "endpoint": "/users/<user_id>/message",
+            "method": "POST",
+            "description": "Send message to user (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "message": "string (required)"
+            },
+            "responses": {
+              "200": "Message sent successfully",
+              "400": "Message content is required",
+              "404": "User not found",
+              "500": "Failed to send message"
+            }
+          },
+          {
+            "endpoint": "/withdrawals",
+            "method": "GET",
+            "description": "Get pending withdrawals (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "page": "number (optional, default: 1)",
+              "per_page": "number (optional, default: 20)",
+              "status": "string (optional, default: pending)"
+            },
+            "responses": {
+              "200": "Pending withdrawals with stats",
+              "500": "Failed to fetch withdrawals"
+            }
+          },
+          {
+            "endpoint": "/withdrawals/<transaction_id>/approve",
+            "method": "POST",
+            "description": "Approve withdrawal (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Withdrawal approved successfully",
+              "400": "Transaction is not a withdrawal or not pending",
+              "404": "Transaction not found",
+              "500": "Failed to approve withdrawal"
+            }
+          },
+          {
+            "endpoint": "/withdrawals/<transaction_id>/reject",
+            "method": "POST",
+            "description": "Reject withdrawal and refund points (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Withdrawal rejected and points refunded",
+              "400": "Transaction is not a withdrawal or not pending",
+              "404": "Transaction not found",
+              "500": "Failed to reject withdrawal"
+            }
+          },
+          {
+            "endpoint": "/referrals/award-bonus",
+            "method": "POST",
+            "description": "Award referral bonus to user (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "user_id": "number (required)",
+              "points": "number (optional)",
+              "amount": "number (optional)",
+              "reason": "string (optional, default: Admin awarded referral bonus)"
+            },
+            "responses": {
+              "200": "Referral bonus awarded successfully",
+              "400": "User ID is required",
+              "404": "User not found",
+              "500": "Failed to award referral bonus"
+            }
+          },
+          {
+            "endpoint": "/dashboard/stats",
+            "method": "GET",
+            "description": "Get admin dashboard statistics (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Dashboard statistics",
+              "500": "Failed to fetch dashboard stats"
+            }
+          },
+          {
+            "endpoint": "/tasks",
+            "method": "GET",
+            "description": "Get all tasks (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "page": "number (optional, default: 1)",
+              "per_page": "number (optional, default: 20)",
+              "search": "string (optional)",
+              "status": "string (optional, all, active, inactive)"
+            },
+            "responses": {
+              "200": "All tasks",
+              "500": "Failed to fetch tasks"
+            }
+          },
+          {
+            "endpoint": "/tasks/<task_id>/details",
+            "method": "GET",
+            "description": "Get task details (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Task details",
+              "404": "Task not found",
+              "500": "Failed to fetch task details"
+            }
+          },
+          {
+            "endpoint": "/tasks",
+            "method": "POST",
+            "description": "Create new task (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "title": "string (required)",
+              "description": "string (optional)",
+              "reward_amount": "number (optional, default: 0)",
+              "points_reward": "number (optional, default: 0)",
+              "category": "string (optional, default: General)",
+              "time_required": "number (optional, default: 0)",
+              "is_active": "boolean (optional, default: true)",
+              "requires_admin_verification": "boolean (optional, default: false)"
+            },
+            "responses": {
+              "201": "Task created successfully",
+              "500": "Failed to create task"
+            }
+          },
+          {
+            "endpoint": "/tasks/<task_id>/update",
+            "method": "POST",
+            "description": "Update task (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "title": "string (optional)",
+              "description": "string (optional)",
+              "reward_amount": "number (optional)",
+              "points_reward": "number (optional)",
+              "category": "string (optional)",
+              "time_required": "number (optional)",
+              "is_active": "boolean (optional)",
+              "requires_admin_verification": "boolean (optional)"
+            },
+            "responses": {
+              "200": "Task updated successfully",
+              "404": "Task not found",
+              "500": "Failed to update task"
+            }
+          },
+          {
+            "endpoint": "/tasks/<task_id>/delete",
+            "method": "DELETE",
+            "description": "Delete task (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Task deleted successfully",
+              "404": "Task not found",
+              "500": "Failed to delete task"
+            }
+          }
+        ]
+      },
+      "notifications": {
+        "prefix": "/api/notifications",
+        "routes": [
+          {
+            "endpoint": "/",
+            "method": "GET",
+            "description": "Get user's notifications",
+            "auth_required": true,
+            "parameters": {
+              "page": "number (optional, default: 1)",
+              "per_page": "number (optional, default: 20)",
+              "unread_only": "boolean (optional, default: false)"
+            },
+            "responses": {
+              "200": "User's notifications",
+              "500": "Failed to fetch notifications"
+            }
+          },
+          {
+            "endpoint": "/<notification_id>/read",
+            "method": "PUT",
+            "description": "Mark notification as read",
+            "auth_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Notification marked as read",
+              "404": "Notification not found",
+              "500": "Failed to mark notification as read"
+            }
+          },
+          {
+            "endpoint": "/mark-all-read",
+            "method": "PUT",
+            "description": "Mark all notifications as read",
+            "auth_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "All notifications marked as read",
+              "500": "Failed to mark notifications as read"
+            }
+          },
+          {
+            "endpoint": "/unread-count",
+            "method": "GET",
+            "description": "Get unread notification count",
+            "auth_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Unread notification count",
+              "500": "Failed to get unread count"
+            }
+          },
+          {
+            "endpoint": "/admin/send",
+            "method": "POST",
+            "description": "Send notification to user or all users (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "user_id": "number (optional, if not provided sends to all)",
+              "title": "string (required)",
+              "message": "string (required)",
+              "type": "string (optional, default: info)"
+            },
+            "responses": {
+              "201": "Notification sent successfully",
+              "400": "Title and message are required",
+              "403": "Access denied",
+              "404": "User not found",
+              "500": "Failed to send notification"
+            }
+          },
+          {
+            "endpoint": "/admin/broadcast",
+            "method": "POST",
+            "description": "Broadcast notification to all users (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "title": "string (required)",
+              "message": "string (required)",
+              "type": "string (optional, default: info)"
+            },
+            "responses": {
+              "201": "Broadcast notification sent",
+              "400": "Title and message are required",
+              "403": "Access denied",
+              "500": "Failed to broadcast notification"
+            }
+          },
+          {
+            "endpoint": "/admin/<notification_id>",
+            "method": "DELETE",
+            "description": "Delete notification (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Notification deleted successfully",
+              "403": "Access denied",
+              "404": "Notification not found",
+              "500": "Failed to delete notification"
+            }
+          },
+          {
+            "endpoint": "/admin/all",
+            "method": "GET",
+            "description": "Get all notifications (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "page": "number (optional, default: 1)",
+              "per_page": "number (optional, default: 20)",
+              "user_id": "number (optional)"
+            },
+            "responses": {
+              "200": "All notifications",
+              "403": "Access denied",
+              "500": "Failed to fetch notifications"
+            }
+          }
+        ]
+      },
+      "support": {
+        "prefix": "/api/support",
+        "routes": [
+          {
+            "endpoint": "/",
+            "method": "POST",
+            "description": "Create support message",
+            "auth_required": true,
+            "parameters": {
+              "subject": "string (required, max 200 chars)",
+              "message": "string (required)"
+            },
+            "responses": {
+              "201": "Support message sent successfully",
+              "400": "Subject and message are required",
+              "404": "User not found",
+              "500": "Failed to send support message"
+            }
+          },
+          {
+            "endpoint": "/",
+            "method": "GET",
+            "description": "Get user's support messages",
+            "auth_required": true,
+            "parameters": {
+              "page": "number (optional, default: 1)",
+              "per_page": "number (optional, default: 10)"
+            },
+            "responses": {
+              "200": "User's support messages",
+              "500": "Failed to fetch support messages"
+            }
+          },
+          {
+            "endpoint": "/<message_id>",
+            "method": "GET",
+            "description": "Get specific support message",
+            "auth_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Support message details",
+              "404": "Support message not found",
+              "500": "Failed to fetch support message"
+            }
+          },
+          {
+            "endpoint": "/whatsapp",
+            "method": "GET",
+            "description": "Get WhatsApp support contact info",
+            "auth_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "WhatsApp support info",
+              "500": "Failed to get WhatsApp support info"
+            }
+          }
+        ]
+      },
+      "partners": {
+        "prefix": "/api/partners",
+        "routes": [
+          {
+            "endpoint": "/stats",
+            "method": "GET",
+            "description": "Get partner statistics",
+            "auth_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Partner statistics",
+              "403": "Access denied or partner not approved",
+              "404": "User not found",
+              "500": "Failed to fetch partner stats"
+            }
+          },
+          {
+            "endpoint": "/referrals",
+            "method": "GET",
+            "description": "Get partner's referrals",
+            "auth_required": true,
+            "parameters": {
+              "page": "number (optional, default: 1)",
+              "per_page": "number (optional, default: 10)"
+            },
+            "responses": {
+              "200": "Partner's referrals",
+              "403": "Access denied or partner not approved",
+              "404": "User not found",
+              "500": "Failed to fetch partner referrals"
+            }
+          },
+          {
+            "endpoint": "/commission-rates",
+            "method": "GET",
+            "description": "Get partner commission rates",
+            "auth_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Commission rates and tier",
+              "403": "Access denied or partner not approved",
+              "404": "User not found",
+              "500": "Failed to fetch commission rates"
+            }
+          },
+          {
+            "endpoint": "/dashboard",
+            "method": "GET",
+            "description": "Get partner dashboard",
+            "auth_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Partner dashboard data",
+              "403": "Access denied or partner not approved",
+              "404": "User not found",
+              "500": "Failed to fetch partner dashboard"
+            }
+          },
+          {
+            "endpoint": "/admin/promote",
+            "method": "POST",
+            "description": "Promote user to partner (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "user_id": "number (required)"
+            },
+            "responses": {
+              "200": "User promoted to partner successfully",
+              "400": "User ID is required",
+              "403": "Access denied",
+              "404": "User not found",
+              "500": "Failed to promote user to partner"
+            }
+          },
+          {
+            "endpoint": "/admin/demote",
+            "method": "POST",
+            "description": "Demote partner to user (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "user_id": "number (required)"
+            },
+            "responses": {
+              "200": "Partner demoted to user successfully",
+              "400": "User ID is required",
+              "403": "Access denied",
+              "404": "User not found",
+              "500": "Failed to demote partner to user"
+            }
+          },
+          {
+            "endpoint": "/admin/approve",
+            "method": "POST",
+            "description": "Approve partner account (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "user_id": "number (required)"
+            },
+            "responses": {
+              "200": "Partner approved successfully",
+              "400": "User ID is required",
+              "403": "Access denied",
+              "404": "User not found",
+              "500": "Failed to approve partner"
+            }
+          },
+          {
+            "endpoint": "/admin/deny",
+            "method": "POST",
+            "description": "Deny partner application (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "user_id": "number (required)"
+            },
+            "responses": {
+              "200": "Partner denied and demoted to user",
+              "400": "User ID is required",
+              "403": "Access denied",
+              "404": "User not found",
+              "500": "Failed to deny partner"
+            }
+          },
+          {
+            "endpoint": "/admin/list",
+            "method": "GET",
+            "description": "List all partners (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "page": "number (optional, default: 1)",
+              "per_page": "number (optional, default: 20)",
+              "search": "string (optional)"
+            },
+            "responses": {
+              "200": "List of all partners",
+              "403": "Access denied",
+              "500": "Failed to list partners"
+            }
+          },
+          {
+            "endpoint": "/codes/generate",
+            "method": "POST",
+            "description": "Generate partner codes (partner or admin only)",
+            "auth_required": true,
+            "parameters": {
+              "count": "number (optional, default: 100, max: 10000)",
+              "point_value": "number (optional, default: 0.1)",
+              "partner_id": "number (optional, default: current user)"
+            },
+            "responses": {
+              "201": "Codes generated successfully",
+              "400": "Validation errors",
+              "403": "Access denied or partner not approved",
+              "500": "Failed to generate codes"
+            }
+          }
+        ]
+      },
+      "tasks": {
+        "prefix": "/api/tasks",
+        "routes": [
+          {
+            "endpoint": "/",
+            "method": "GET",
+            "description": "Get available tasks",
+            "auth_required": true,
+            "parameters": {
+              "category": "string (optional)",
+              "page": "number (optional, default: 1)",
+              "per_page": "number (optional, default: 10)"
+            },
+            "responses": {
+              "200": "Available tasks with user status",
+              "500": "Failed to fetch tasks"
+            }
+          },
+          {
+            "endpoint": "/<task_id>/start",
+            "method": "POST",
+            "description": "Start a task",
+            "auth_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Task started successfully",
+              "400": "Task already started or completed",
+              "404": "Task not found or inactive",
+              "500": "Failed to start task"
+            }
+          },
+          {
+            "endpoint": "/<task_id>/complete",
+            "method": "POST",
+            "description": "Complete a task",
+            "auth_required": true,
+            "parameters": {
+              "proof_text": "string (optional)",
+              "proof_image": "string (optional)"
+            },
+            "responses": {
+              "200": "Task completed successfully",
+              "201": "Task submitted for admin review (if requires verification)",
+              "400": "Task not started or already completed",
+              "404": "Task not found or inactive",
+              "500": "Failed to complete task"
+            }
+          },
+          {
+            "endpoint": "/admin",
+            "method": "POST",
+            "description": "Create new task (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "title": "string (required)",
+              "description": "string (optional)",
+              "reward_amount": "number (optional, default: 0)",
+              "points_reward": "number (optional, default: 0)",
+              "category": "string (optional, default: General)",
+              "time_required": "number (optional, default: 0)",
+              "is_active": "boolean (optional, default: true)",
+              "requires_admin_verification": "boolean (optional, default: false)"
+            },
+            "responses": {
+              "201": "Task created successfully",
+              "400": "Title is required",
+              "500": "Failed to create task"
+            }
+          },
+          {
+            "endpoint": "/admin/<task_id>",
+            "method": "PUT",
+            "description": "Update task (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "title": "string (optional)",
+              "description": "string (optional)",
+              "reward_amount": "number (optional)",
+              "points_reward": "number (optional)",
+              "category": "string (optional)",
+              "time_required": "number (optional)",
+              "is_active": "boolean (optional)",
+              "requires_admin_verification": "boolean (optional)"
+            },
+            "responses": {
+              "200": "Task updated successfully",
+              "404": "Task not found",
+              "500": "Failed to update task"
+            }
+          },
+          {
+            "endpoint": "/admin/<task_id>",
+            "method": "DELETE",
+            "description": "Delete task (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {},
+            "responses": {
+              "200": "Task deleted successfully",
+              "404": "Task not found",
+              "500": "Failed to delete task"
+            }
+          },
+          {
+            "endpoint": "/admin",
+            "method": "GET",
+            "description": "Get all tasks (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "page": "number (optional, default: 1)",
+              "per_page": "number (optional, default: 20)",
+              "category": "string (optional)",
+              "active_only": "boolean (optional, default: false)"
+            },
+            "responses": {
+              "200": "All tasks",
+              "500": "Failed to fetch tasks"
+            }
+          },
+          {
+            "endpoint": "/daily/upload-codes",
+            "method": "POST",
+            "description": "Upload daily codes for tasks",
+            "auth_required": true,
+            "parameters": {
+              "codes": "array of strings (required)"
+            },
+            "responses": {
+              "200": "Codes processed successfully",
+              "400": "Codes array is required",
+              "404": "User not found",
+              "500": "Failed to process codes"
+            }
+          },
+          {
+            "endpoint": "/daily/set-requirement",
+            "method": "POST",
+            "description": "Set daily code requirement for user (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "user_id": "number (required)",
+              "requirement": "number (required, 5 or 10)"
+            },
+            "responses": {
+              "200": "Daily requirement set successfully",
+              "400": "User ID is required or invalid requirement",
+              "404": "User not found",
+              "500": "Failed to set daily requirement"
+            }
+          },
+          {
+            "endpoint": "/admin/<task_id>/complete",
+            "method": "POST",
+            "description": "Admin complete task for user (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "user_id": "number (required)"
+            },
+            "responses": {
+              "200": "Task completed and reward awarded",
+              "400": "User ID is required",
+              "404": "Task not found or inactive",
+              "500": "Failed to complete task"
+            }
+          },
+          {
+            "endpoint": "/admin/completed-tasks",
+            "method": "GET",
+            "description": "Get tasks pending review (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "page": "number (optional, default: 1)",
+              "per_page": "number (optional, default: 20)"
+            },
+            "responses": {
+              "200": "Tasks pending review",
+              "500": "Failed to fetch tasks for review"
+            }
+          },
+          {
+            "endpoint": "/admin/review-history",
+            "method": "GET",
+            "description": "Get task review history (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "page": "number (optional, default: 1)",
+              "per_page": "number (optional, default: 20)"
+            },
+            "responses": {
+              "200": "Task review history",
+              "500": "Failed to fetch review history"
+            }
+          },
+          {
+            "endpoint": "/admin/<user_task_id>/reject",
+            "method": "POST",
+            "description": "Reject task submission (admin only)",
+            "auth_required": true,
+            "admin_required": true,
+            "parameters": {
+              "reason": "string (optional, default: Task requirements not met)"
+            },
+            "responses": {
+              "200": "Task rejected successfully",
+              "404": "Task not found or not pending review",
+              "500": "Failed to reject task"
+            }
+          },
+          {
+            "endpoint": "/user/rejected-tasks",
+            "method": "GET",
+            "description": "Get user's rejected tasks",
+            "auth_required": true,
+            "parameters": {
+              "page": "number (optional, default: 1)",
+              "per_page": "number (optional, default: 10)"
+            },
+            "responses": {
+              "200": "User's rejected tasks",
+              "500": "Failed to fetch rejected tasks"
+            }
+          }
+        ]
+      }
+    },
+    "authentication": {
+      "type": "JWT",
+      "header": "Authorization: Bearer <token>",
+      "token_expiration": "24 hours",
+      "refresh_token": "Not implemented"
+    },
+    "error_responses": {
+      "401": [
+        {
+          "message": "Authorization token is required",
+          "error": "authorization_required"
+        },
+        {
+          "message": "Token has expired",
+          "error": "token_expired"
+        },
+        {
+          "message": "Invalid token",
+          "error": "invalid_token"
+        },
+        {
+          "message": "Token has been revoked",
+          "error": "token_revoked"
+        }
+      ],
+      "403": {
+        "message": "Access denied"
+      },
+      "404": {
+        "message": "Endpoint not found"
+      }
+    }
+  }
+}

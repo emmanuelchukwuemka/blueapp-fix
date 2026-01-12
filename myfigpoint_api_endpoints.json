@@ -1,370 +1,453 @@
 {
-  "baseUrl": "http://72.62.4.119/api",
-  "apiInfo": {
-    "name": "MyFigPoint API",
-    "version": "1.0.0",
-    "description": "Backend API for MyFigPoint application deployed at 72.62.4.119"
-  },
   "endpoints": {
     "authentication": {
       "login": {
-        "method": "POST",
-        "url": "/auth/login",
-        "description": "User login",
-        "requiresAuth": false,
-        "requestBody": {
-          "email": "string",
-          "password": "string"
-        },
-        "response": {
-          "token": "string",
-          "user": "object"
-        }
+        "url": "/api/auth/login",
+        "method": "POST"
       },
-      "signup": {
-        "method": "POST",
-        "url": "/auth/signup",
-        "description": "User registration",
-        "requiresAuth": false,
-        "requestBody": {
-          "full_name": "string",
-          "email": "string",
-          "password": "string",
-          "phone": "string"
-        },
-        "response": {
-          "message": "string",
-          "user": "object"
-        }
+      "register": {
+        "url": "/api/auth/register",
+        "method": "POST"
       },
       "forgotPassword": {
-        "method": "POST",
-        "url": "/auth/forgot-password",
-        "description": "Forgot password",
-        "requiresAuth": false,
-        "requestBody": {
-          "email": "string"
-        },
-        "response": {
-          "message": "string"
-        }
+        "url": "/api/auth/forgot-password",
+        "method": "POST"
       },
       "resetPassword": {
-        "method": "POST",
-        "url": "/auth/reset-password",
-        "description": "Reset password",
-        "requiresAuth": false,
-        "requestBody": {
-          "token": "string",
-          "new_password": "string"
-        },
-        "response": {
-          "message": "string"
-        }
+        "url": "/api/auth/reset-password",
+        "method": "POST"
+      },
+      "profile": {
+        "url": "/api/auth/profile",
+        "method": "GET"
+      },
+      "google": {
+        "url": "/api/auth/google",
+        "method": "GET"
+      },
+      "apple": {
+        "url": "/api/auth/apple",
+        "method": "GET"
+      },
+      "googleCallback": {
+        "url": "/api/auth/google/callback",
+        "method": "GET"
+      },
+      "appleCallback": {
+        "url": "/api/auth/apple/callback",
+        "method": "POST"
       }
     },
-    "user": {
+    "users": {
       "getProfile": {
-        "method": "GET",
-        "url": "/users/profile",
-        "description": "Get user profile",
-        "requiresAuth": true,
-        "response": {
-          "user": "object"
-        }
+        "url": "/api/users/profile",
+        "method": "GET"
       },
       "updateProfile": {
-        "method": "PUT",
-        "url": "/users/profile",
-        "description": "Update user profile",
-        "requiresAuth": true,
-        "requestBody": {
-          "full_name": "string",
-          "phone": "string",
-          "bank_name": "string",
-          "account_name": "string",
-          "account_number": "string"
-        },
-        "response": {
-          "message": "string",
-          "user": "object"
-        }
+        "url": "/api/users/profile",
+        "method": "PUT"
       },
-      "getUsers": {
-        "method": "GET",
-        "url": "/users/",
-        "description": "Get users list (admin only)",
-        "requiresAuth": true,
-        "adminOnly": true,
-        "response": {
-          "users": "array"
-        }
+      "changePassword": {
+        "url": "/api/users/change-password",
+        "method": "POST"
+      },
+      "adminUpdateRole": {
+        "url": "/api/users/admin/{user_id}/role",
+        "method": "PUT"
+      },
+      "adminUpdatePoints": {
+        "url": "/api/users/admin/{user_id}/points",
+        "method": "PUT"
+      },
+      "adminSearchUsers": {
+        "url": "/api/users/admin/search",
+        "method": "GET"
+      },
+      "adminSuspendUser": {
+        "url": "/api/users/admin/{user_id}/suspend",
+        "method": "POST"
+      },
+      "adminUnsuspendUser": {
+        "url": "/api/users/admin/{user_id}/unsuspend",
+        "method": "POST"
+      },
+      "uploadAvatar": {
+        "url": "/api/users/avatar",
+        "method": "POST"
       }
     },
     "points": {
       "getBalance": {
-        "method": "GET",
-        "url": "/points/balance",
-        "description": "Get user's points balance",
-        "requiresAuth": true,
-        "response": {
-          "balance": "number",
-          "total_earned": "number",
-          "total_withdrawn": "number"
-        }
+        "url": "/api/points/balance",
+        "method": "GET"
       },
       "getHistory": {
-        "method": "GET",
-        "url": "/points/history",
-        "description": "Get points history",
-        "requiresAuth": true,
-        "response": {
-          "history": "array"
-        }
+        "url": "/api/points/history",
+        "method": "GET"
+      },
+      "withdraw": {
+        "url": "/api/points/withdraw",
+        "method": "POST"
+      },
+      "convert": {
+        "url": "/api/points/convert",
+        "method": "POST"
       }
     },
     "codes": {
-      "getCodes": {
-        "method": "GET",
-        "url": "/codes/",
-        "description": "Get available codes",
-        "requiresAuth": true,
-        "response": {
-          "codes": "array"
-        }
-      },
       "redeemCode": {
-        "method": "POST",
-        "url": "/codes/redeem",
-        "description": "Redeem a code",
-        "requiresAuth": true,
-        "requestBody": {
-          "code": "string"
-        },
-        "response": {
-          "message": "string",
-          "points_awarded": "number"
-        }
+        "url": "/api/codes/redeem",
+        "method": "POST"
+      },
+      "getHistory": {
+        "url": "/api/codes/history",
+        "method": "GET"
+      },
+      "validateCode": {
+        "url": "/api/codes/validate/{code}",
+        "method": "GET"
+      },
+      "getCodeInfo": {
+        "url": "/api/codes/info/{code}",
+        "method": "GET"
+      },
+      "adminGetAll": {
+        "url": "/api/codes/admin/all",
+        "method": "GET"
+      },
+      "adminDelete": {
+        "url": "/api/codes/admin/{code_id}/delete",
+        "method": "DELETE"
+      },
+      "adminStats": {
+        "url": "/api/codes/admin/stats",
+        "method": "GET"
       }
     },
     "transactions": {
       "getHistory": {
-        "method": "GET",
-        "url": "/transactions/",
-        "description": "Get transaction history",
-        "requiresAuth": true,
-        "response": {
-          "transactions": "array"
-        }
+        "url": "/api/transactions",
+        "method": "GET"
+      },
+      "getTransaction": {
+        "url": "/api/transactions/{transaction_id}",
+        "method": "GET"
+      },
+      "adminGetAll": {
+        "url": "/api/transactions/admin",
+        "method": "GET"
+      },
+      "adminUpdateStatus": {
+        "url": "/api/transactions/admin/{transaction_id}/update-status",
+        "method": "PUT"
+      },
+      "adminGetUserTransactions": {
+        "url": "/api/transactions/admin/user/{user_id}",
+        "method": "GET"
+      },
+      "getSummary": {
+        "url": "/api/transactions/summary",
+        "method": "GET"
       }
     },
     "referrals": {
-      "getReferrals": {
-        "method": "GET",
-        "url": "/referrals/",
-        "description": "Get referral information",
-        "requiresAuth": true,
-        "response": {
-          "referrals": "array",
-          "referral_code": "string",
-          "referral_count": "number",
-          "total_earnings": "number"
-        }
+      "getStats": {
+        "url": "/api/referrals/stats",
+        "method": "GET"
+      },
+      "getUsers": {
+        "url": "/api/referrals/users",
+        "method": "GET"
+      },
+      "getLink": {
+        "url": "/api/referrals/link",
+        "method": "GET"
+      },
+      "getHistory": {
+        "url": "/api/referrals/history",
+        "method": "GET"
+      },
+      "adminGetAll": {
+        "url": "/api/referrals/admin/all",
+        "method": "GET"
+      },
+      "adminGetBonuses": {
+        "url": "/api/referrals/admin/bonuses",
+        "method": "GET"
+      },
+      "adminGetTopReferrers": {
+        "url": "/api/referrals/admin/top-referrers",
+        "method": "GET"
       }
     },
-    "tasks": {
+    "admin": {
+      "generateCodes": {
+        "url": "/api/admin/codes/generate",
+        "method": "POST"
+      },
+      "getCodes": {
+        "url": "/api/admin/codes",
+        "method": "GET"
+      },
+      "exportCodes": {
+        "url": "/api/admin/codes/export/{batch_id}",
+        "method": "GET"
+      },
+      "getRecentBatch": {
+        "url": "/api/admin/codes/recent-batch",
+        "method": "GET"
+      },
+      "deleteCode": {
+        "url": "/api/admin/codes/{code_id}/delete",
+        "method": "DELETE"
+      },
+      "getCodeDetails": {
+        "url": "/api/admin/codes/{code}/details",
+        "method": "GET"
+      },
+      "getSupportMessages": {
+        "url": "/api/admin/support-messages",
+        "method": "GET"
+      },
+      "respondToSupportMessage": {
+        "url": "/api/admin/support-messages/{message_id}/respond",
+        "method": "POST"
+      },
+      "getRecentActivities": {
+        "url": "/api/admin/activities/recent",
+        "method": "GET"
+      },
+      "updateUserPoints": {
+        "url": "/api/admin/users/points/update",
+        "method": "POST"
+      },
+      "getUsers": {
+        "url": "/api/admin/users",
+        "method": "GET"
+      },
+      "getUserDetails": {
+        "url": "/api/admin/users/{user_id}/details",
+        "method": "GET"
+      },
+      "suspendUser": {
+        "url": "/api/admin/users/{user_id}/suspend",
+        "method": "POST"
+      },
+      "unsuspendUser": {
+        "url": "/api/admin/users/{user_id}/unsuspend",
+        "method": "POST"
+      },
+      "verifyUser": {
+        "url": "/api/admin/users/{user_id}/verify",
+        "method": "POST"
+      },
+      "updateUser": {
+        "url": "/api/admin/users/{user_id}/update",
+        "method": "POST"
+      },
+      "verifyDocuments": {
+        "url": "/api/admin/users/{user_id}/verify-documents",
+        "method": "POST"
+      },
+      "messageUser": {
+        "url": "/api/admin/users/{user_id}/message",
+        "method": "POST"
+      },
+      "getWithdrawals": {
+        "url": "/api/admin/withdrawals",
+        "method": "GET"
+      },
+      "approveWithdrawal": {
+        "url": "/api/admin/withdrawals/{transaction_id}/approve",
+        "method": "POST"
+      },
+      "rejectWithdrawal": {
+        "url": "/api/admin/withdrawals/{transaction_id}/reject",
+        "method": "POST"
+      },
+      "awardReferralBonus": {
+        "url": "/api/admin/referrals/award-bonus",
+        "method": "POST"
+      },
+      "getDashboardStats": {
+        "url": "/api/admin/dashboard/stats",
+        "method": "GET"
+      },
       "getTasks": {
-        "method": "GET",
-        "url": "/tasks/",
-        "description": "Get available tasks",
-        "requiresAuth": true,
-        "response": {
-          "tasks": "array",
-          "total": "number",
-          "pages": "number",
-          "current_page": "number"
-        }
+        "url": "/api/admin/tasks",
+        "method": "GET"
       },
-      "startTask": {
-        "method": "POST",
-        "url": "/tasks/{task_id}/start",
-        "description": "Start a task",
-        "requiresAuth": true,
-        "requestBody": {},
-        "response": {
-          "message": "string",
-          "task": "object",
-          "user_task": "object"
-        }
+      "getTaskDetails": {
+        "url": "/api/admin/tasks/{task_id}/details",
+        "method": "GET"
       },
-      "completeTask": {
-        "method": "POST",
-        "url": "/tasks/{task_id}/complete",
-        "description": "Complete a task",
-        "requiresAuth": true,
-        "requestBody": {
-          "proof_text": "string",
-          "proof_image": "string"
-        },
-        "response": {
-          "message": "string",
-          "points_awarded": "number",
-          "reward_awarded": "number",
-          "new_points_balance": "number",
-          "new_total_earnings": "number"
-        }
+      "createTask": {
+        "url": "/api/admin/tasks",
+        "method": "POST"
+      },
+      "updateTask": {
+        "url": "/api/admin/tasks/{task_id}/update",
+        "method": "POST"
+      },
+      "deleteTask": {
+        "url": "/api/admin/tasks/{task_id}/delete",
+        "method": "DELETE"
       }
     },
     "notifications": {
       "getNotifications": {
-        "method": "GET",
-        "url": "/notifications/",
-        "description": "Get user notifications",
-        "requiresAuth": true,
-        "response": {
-          "notifications": "array"
-        }
+        "url": "/api/notifications",
+        "method": "GET"
       },
-      "createNotification": {
-        "method": "POST",
-        "url": "/notifications/",
-        "description": "Create notification",
-        "requiresAuth": true,
-        "requestBody": {
-          "title": "string",
-          "message": "string",
-          "type": "string"
-        },
-        "response": {
-          "message": "string",
-          "notification": "object"
-        }
+      "markAsRead": {
+        "url": "/api/notifications/{notification_id}/read",
+        "method": "PUT"
+      },
+      "markAllAsRead": {
+        "url": "/api/notifications/mark-all-read",
+        "method": "PUT"
+      },
+      "getUnreadCount": {
+        "url": "/api/notifications/unread-count",
+        "method": "GET"
+      },
+      "adminSend": {
+        "url": "/api/notifications/admin/send",
+        "method": "POST"
+      },
+      "adminBroadcast": {
+        "url": "/api/notifications/admin/broadcast",
+        "method": "POST"
+      },
+      "adminDelete": {
+        "url": "/api/notifications/admin/{notification_id}",
+        "method": "DELETE"
+      },
+      "adminGetAll": {
+        "url": "/api/notifications/admin/all",
+        "method": "GET"
       }
     },
     "support": {
-      "getTickets": {
-        "method": "GET",
-        "url": "/support/tickets",
-        "description": "Get support tickets",
-        "requiresAuth": true,
-        "response": {
-          "tickets": "array"
-        }
-      },
       "createTicket": {
-        "method": "POST",
-        "url": "/support/tickets",
-        "description": "Create a support ticket",
-        "requiresAuth": true,
-        "requestBody": {
-          "subject": "string",
-          "message": "string",
-          "category": "string"
-        },
-        "response": {
-          "message": "string",
-          "ticket": "object"
-        }
+        "url": "/api/support",
+        "method": "POST"
+      },
+      "getMessages": {
+        "url": "/api/support",
+        "method": "GET"
+      },
+      "getMessage": {
+        "url": "/api/support/{message_id}",
+        "method": "GET"
+      },
+      "getWhatsAppSupport": {
+        "url": "/api/support/whatsapp",
+        "method": "GET"
       }
     },
     "partners": {
-      "getPartners": {
-        "method": "GET",
-        "url": "/partners/",
-        "description": "Get partner information",
-        "requiresAuth": true,
-        "response": {
-          "partners": "array"
-        }
+      "getStats": {
+        "url": "/api/partners/stats",
+        "method": "GET"
       },
-      "registerPartner": {
-        "method": "POST",
-        "url": "/partners/",
-        "description": "Partner registration",
-        "requiresAuth": true,
-        "requestBody": {
-          "business_name": "string",
-          "business_type": "string",
-          "contact_info": "string"
-        },
-        "response": {
-          "message": "string",
-          "partner": "object"
-        }
+      "getReferrals": {
+        "url": "/api/partners/referrals",
+        "method": "GET"
+      },
+      "getCommissionRates": {
+        "url": "/api/partners/commission-rates",
+        "method": "GET"
+      },
+      "getDashboard": {
+        "url": "/api/partners/dashboard",
+        "method": "GET"
+      },
+      "adminPromote": {
+        "url": "/api/partners/admin/promote",
+        "method": "POST"
+      },
+      "adminDemote": {
+        "url": "/api/partners/admin/demote",
+        "method": "POST"
+      },
+      "adminApprove": {
+        "url": "/api/partners/admin/approve",
+        "method": "POST"
+      },
+      "adminDeny": {
+        "url": "/api/partners/admin/deny",
+        "method": "POST"
+      },
+      "adminList": {
+        "url": "/api/partners/admin/list",
+        "method": "GET"
+      },
+      "generateCodes": {
+        "url": "/api/partners/codes/generate",
+        "method": "POST"
       }
     },
-    "admin": {
-      "getUsers": {
-        "method": "GET",
-        "url": "/admin/users",
-        "description": "Get all users (admin only)",
-        "requiresAuth": true,
-        "adminOnly": true,
-        "response": {
-          "users": "array"
-        }
-      },
+    "tasks": {
       "getTasks": {
-        "method": "GET",
-        "url": "/admin/tasks",
-        "description": "Get all tasks (admin only)",
-        "requiresAuth": true,
-        "adminOnly": true,
-        "response": {
-          "tasks": "array"
-        }
+        "url": "/api/tasks",
+        "method": "GET"
       },
-      "createTask": {
-        "method": "POST",
-        "url": "/admin/tasks",
-        "description": "Create a task (admin only)",
-        "requiresAuth": true,
-        "adminOnly": true,
-        "requestBody": {
-          "title": "string",
-          "description": "string",
-          "reward_amount": "number",
-          "points_reward": "number",
-          "category": "string",
-          "time_required": "number",
-          "is_active": "boolean",
-          "requires_admin_verification": "boolean"
-        },
-        "response": {
-          "message": "string",
-          "task": "object"
-        }
+      "startTask": {
+        "url": "/api/tasks/{task_id}/start",
+        "method": "POST"
       },
-      "updateTask": {
-        "method": "PUT",
-        "url": "/admin/tasks/{task_id}",
-        "description": "Update a task (admin only)",
-        "requiresAuth": true,
-        "adminOnly": true,
-        "requestBody": {
-          "title": "string",
-          "description": "string",
-          "reward_amount": "number",
-          "points_reward": "number",
-          "category": "string",
-          "time_required": "number",
-          "is_active": "boolean",
-          "requires_admin_verification": "boolean"
-        },
-        "response": {
-          "message": "string",
-          "task": "object"
-        }
+      "completeTask": {
+        "url": "/api/tasks/{task_id}/complete",
+        "method": "POST"
       },
-      "deleteTask": {
-        "method": "DELETE",
-        "url": "/admin/tasks/{task_id}",
-        "description": "Delete a task (admin only)",
-        "requiresAuth": true,
-        "adminOnly": true,
-        "response": {
-          "message": "string"
-        }
+      "adminCreate": {
+        "url": "/api/tasks/admin",
+        "method": "POST"
+      },
+      "adminUpdate": {
+        "url": "/api/tasks/admin/{task_id}",
+        "method": "PUT"
+      },
+      "adminDelete": {
+        "url": "/api/tasks/admin/{task_id}",
+        "method": "DELETE"
+      },
+      "adminGetAll": {
+        "url": "/api/tasks/admin",
+        "method": "GET"
+      },
+      "uploadDailyCodes": {
+        "url": "/api/tasks/daily/upload-codes",
+        "method": "POST"
+      },
+      "adminSetDailyRequirement": {
+        "url": "/api/tasks/daily/set-requirement",
+        "method": "POST"
+      },
+      "adminCompleteTask": {
+        "url": "/api/tasks/admin/{task_id}/complete",
+        "method": "POST"
+      },
+      "adminGetCompletedTasks": {
+        "url": "/api/tasks/admin/completed-tasks",
+        "method": "GET"
+      },
+      "adminGetReviewHistory": {
+        "url": "/api/tasks/admin/review-history",
+        "method": "GET"
+      },
+      "adminRejectTask": {
+        "url": "/api/tasks/admin/{user_task_id}/reject",
+        "method": "POST"
+      },
+      "getRejectedTasks": {
+        "url": "/api/tasks/user/rejected-tasks",
+        "method": "GET"
+      },
+      "getCategories": {
+        "url": "/api/tasks/categories",
+        "method": "GET"
       }
     }
   }

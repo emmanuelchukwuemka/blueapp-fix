@@ -9,7 +9,7 @@ const SLIDES = [
     {
         id: '1',
         title: 'Earn Points Daily',
-        description: 'Complete simple tasks and earn points that you can redeem for exciting rewards.',
+        description: 'Complete simple tasks and collect points that you can redeem for exciting rewards.',
         image: require('../../../assets/splash images/earn.jpg'),
     },
     {
@@ -59,7 +59,7 @@ export default function OnboardingScreen({ navigation }) {
                         >
                             <View style={styles.contentContainer}>
                                 <Image
-                                    source={require('../../../assets/logo.png')}
+                                    source={require('../../../assets/BluePoint1.png')}
                                     style={styles.logo}
                                     resizeMode="contain"
                                 />

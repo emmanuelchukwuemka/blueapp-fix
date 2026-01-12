@@ -14,7 +14,7 @@ export default function TaskDetailScreen({ navigation, route }) {
     const [image, setImage] = useState(null);
     const [comment, setComment] = useState('');
     const [loading, setLoading] = useState(false);
-    
+
     useEffect(() => {
         if (initialTask?.task) {
             setTask(initialTask.task);
@@ -24,16 +24,21 @@ export default function TaskDetailScreen({ navigation, route }) {
     }, [initialTask]);
 
     const pickImage = async () => {
-        // No permissions request is necessary for launching the image library
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaType.Images,
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 1,
-        });
+        try {
+            // No permissions request is necessary for launching the image library
+            let result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                aspect: [4, 3],
+                quality: 1,
+            });
 
-        if (!result.canceled) {
-            setImage(result.assets[0].uri);
+            if (!result.canceled) {
+                setImage(result.assets[0].uri);
+            }
+        } catch (error) {
+            console.error('Error picking image:', error);
+            Alert.alert('Error', 'Failed to pick image');
         }
     };
 
@@ -42,17 +47,19 @@ export default function TaskDetailScreen({ navigation, route }) {
             Alert.alert('Error', 'Task ID is missing');
             return;
         }
-        
+
         setLoading(true);
         try {
             const response = await apiService.startTask(task.id);
-            
+
             Alert.alert('Success', 'Task started successfully', [
-                { text: 'OK', onPress: () => {
-                    setTask(response.task);
-                    // Update the task status in the parent screen if needed
-                    navigation.setParams({ task: { ...task, user_status: 'in_progress' } });
-                }}
+                {
+                    text: 'OK', onPress: () => {
+                        setTask(response.task);
+                        // Update the task status in the parent screen if needed
+                        navigation.setParams({ task: { ...task, user_status: 'in_progress' } });
+                    }
+                }
             ]);
         } catch (error) {
             console.error('Error starting task:', error);
@@ -61,24 +68,26 @@ export default function TaskDetailScreen({ navigation, route }) {
             setLoading(false);
         }
     };
-    
+
     const handleCompleteTask = async () => {
         if (!task?.id) {
             Alert.alert('Error', 'Task ID is missing');
             return;
         }
-        
+
         setLoading(true);
         try {
             const response = await apiService.completeTask(task.id);
-            
+
             Alert.alert('Success', response.message || 'Task completed successfully', [
-                { text: 'OK', onPress: () => {
-                    setTask({...task, user_status: 'completed'});
-                    // Update the task status in the parent screen if needed
-                    navigation.setParams({ task: { ...task, user_status: 'completed' } });
-                    navigation.goBack();
-                }}
+                {
+                    text: 'OK', onPress: () => {
+                        setTask({ ...task, user_status: 'completed' });
+                        // Update the task status in the parent screen if needed
+                        navigation.setParams({ task: { ...task, user_status: 'completed' } });
+                        navigation.goBack();
+                    }
+                }
             ]);
         } catch (error) {
             console.error('Error completing task:', error);

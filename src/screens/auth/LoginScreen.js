@@ -46,23 +46,23 @@ export default function LoginScreen({ navigation }) {
     }, []);
 
     const [loading, setLoading] = useState(false);
-    
+
     const handleLogin = async () => {
         if (!email || !password) {
             Alert.alert('Error', 'Please fill in all fields');
             return;
         }
-        
+
         setLoading(true);
         try {
             const response = await apiService.login({ email, password });
-            
+
             // Save the token to AsyncStorage
             await apiService.setToken(response.access_token);
-            
+
             // Update user context with user data
             login(response.user);
-            
+
             navigation.replace('Main');
         } catch (error) {
             Alert.alert('Login Error', error.message || 'Failed to login');
@@ -104,7 +104,7 @@ export default function LoginScreen({ navigation }) {
                         {/* Logo - Circular & Centered */}
                         <View style={styles.logoContainer}>
                             <View style={styles.logoWrapper}>
-                                <Avatar.Image size={80} source={require('../../../assets/logo.png')} style={{ backgroundColor: 'transparent' }} />
+                                <Avatar.Image size={80} source={require('../../../assets/BluePoint1.png')} style={{ backgroundColor: 'transparent' }} />
                             </View>
                         </View>
 

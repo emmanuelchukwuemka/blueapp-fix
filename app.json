@@ -4,11 +4,14 @@
     "slug": "myfigapp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/logo.png",
+    "icon": "./assets/BluePoint1.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "plugins": [
+      "expo-image-picker"
+    ],
     "splash": {
-      "image": "./assets/logo.png",
+      "image": "./assets/BluePoint1.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -17,14 +20,40 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/logo.png",
+        "foregroundImage": "./assets/BluePoint1.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.myfigapp"
+      "package": "com.anonymous.myfigapp",
+      "networkSecurityConfig": {
+        "domainConfigs": [
+          {
+            "domains": [
+              "72.62.4.119"
+            ],
+            "subDomainsEnabled": true,
+            "cleartextTrafficPermitted": true
+          }
+        ],
+        "cleartextTrafficPermitted": true
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
-      "favicon": "./assets/logo.png"
+      "favicon": "./assets/BluePoint1.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "678074e8-6376-4308-a4db-c14843fbc968"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "enabled": false
     }
   }
 }

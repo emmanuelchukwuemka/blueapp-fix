@@ -37,7 +37,7 @@ const mapApiTaskToScreenTask = (apiTask) => {
     };
 };
 
-const FILTER_OPTIONS = ['All', 'Available', 'Completed', 'Pending'];
+
 const ICON_COLOR = '#5B9FFF';
 
 const TaskItem = ({ item, index, navigation }) => {
@@ -117,13 +117,11 @@ export default function TasksScreen({ navigation }) {
             setLoading(true);
             try {
                 const params = {};
-                if (filter !== 'All' && filter !== 'Pending') {
-                    // API doesn't have a direct filter for status, so we'll filter after
-                    // If we need to filter by status, we'll do it in the UI
-                }
                 
                 const response = await apiService.getTasks(params);
-                const mappedTasks = response.tasks.map(mapApiTaskToScreenTask);
+                // Show all tasks, not just referral tasks
+                const allTasks = response.tasks;
+                const mappedTasks = allTasks.map(mapApiTaskToScreenTask);
                 setTasks(mappedTasks);
             } catch (error) {
                 console.error('Error fetching tasks:', error);
@@ -136,18 +134,45 @@ export default function TasksScreen({ navigation }) {
         if (user?.isLoggedIn) {
             fetchTasks();
         }
-    }, [filter, user]);
+    }, [user]);
+    
+    // Refresh data when coming back to the screen
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            if (user?.isLoggedIn) {
+                const fetchTasks = async () => {
+                    setLoading(true);
+                    try {
+                        const params = {};
+                        
+                        const response = await apiService.getTasks(params);
+                        // Show all tasks, not just referral tasks
+                        const allTasks = response.tasks;
+                        const mappedTasks = allTasks.map(mapApiTaskToScreenTask);
+                        setTasks(mappedTasks);
+                    } catch (error) {
+                        console.error('Error fetching tasks:', error);
+                        Alert.alert('Error', `Failed to load tasks: ${error.message || 'Unknown error'}`);
+                    } finally {
+                        setLoading(false);
+                    }
+                };
+                fetchTasks();
+            }
+        });
+        
+        return unsubscribe;
+    }, [navigation, user]);
 
     const filteredTasks = tasks.filter(task =>
-        task.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        (filter === 'All' || task.status === filter)
+        task.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     return (
         <View style={styles.container}>
             <View style={styles.header}>
                 <Text variant="headlineSmall" style={styles.headerTitle}>Available Tasks</Text>
-                <Text variant="bodyMedium" style={styles.headerSubtitle}>Complete tasks to earn huge rewards</Text>
+                <Text variant="bodyMedium" style={styles.headerSubtitle}>Complete tasks to earn rewards</Text>
 
                 <Searchbar
                     placeholder="Search for tasks..."
@@ -157,26 +182,6 @@ export default function TasksScreen({ navigation }) {
                     inputStyle={styles.searchInput}
                     iconColor={Colors.primary}
                 />
-
-                <View style={styles.filterContainer}>
-                    {FILTER_OPTIONS.map(f => (
-                        <TouchableOpacity
-                            key={f}
-                            onPress={() => setFilter(f)}
-                            style={[
-                                styles.filterChip,
-                                filter === f ? styles.activeChip : styles.inactiveChip
-                            ]}
-                        >
-                            <Text style={[
-                                styles.chipText,
-                                filter === f ? styles.activeChipText : styles.inactiveChipText
-                            ]}>
-                                {f}
-                            </Text>
-                        </TouchableOpacity>
-                    ))}
-                </View>
             </View>
 
             <FlatList

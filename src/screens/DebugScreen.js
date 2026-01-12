@@ -1,106 +1,112 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Alert, Button } from 'react-native';
-import { Text, Surface } from 'react-native-paper';
-import { Colors, Spacing } from '../constants/colors';
+import { View, Text, Button, ScrollView, StyleSheet, Alert } from 'react-native';
 import apiService from '../services/api';
 
-// Simple debug screen to test API connectivity
 const DebugScreen = () => {
-  const [testResults, setTestResults] = useState({});
-  const [loading, setLoading] = useState({});
+  const [testResults, setTestResults] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const runTest = async (testName, testFunction) => {
-    setLoading(prev => ({ ...prev, [testName]: true }));
+  const runApiTests = async () => {
+    setIsLoading(true);
+    setTestResults('Running API tests...\n');
+    
     try {
-      const result = await testFunction();
-      setTestResults(prev => ({
-        ...prev,
-        [testName]: { success: true, result, timestamp: new Date().toISOString() }
-      }));
-      Alert.alert('Success', `Test ${testName} passed!`);
+      // Test 1: Check if we can make a request to the server
+      setTestResults(prev => prev + '1. Testing basic API connection...\n');
+      
+      try {
+        // This should return 401 since we don't have a token, but it will confirm the server is reachable
+        await apiService.request('/auth/profile', { method: 'GET' });
+        setTestResults(prev => prev + '   ✓ Server is accessible\n');
+      } catch (error) {
+        if (error.message.includes('401')) {
+          setTestResults(prev => prev + '   ✓ Server is accessible (401 - authentication required)\n');
+        } else if (error.message.includes('Network request failed')) {
+          setTestResults(prev => prev + '   ✗ Network error - server may be unreachable\n');
+        } else {
+          setTestResults(prev => prev + `   ? Server response: ${error.message}\n`);
+        }
+      }
+
+      // Test 2: Test endpoints configuration
+      setTestResults(prev => prev + '\n2. Testing endpoints configuration...\n');
+      
+      // Check if the endpoints file is properly loaded
+      try {
+        // We'll try to access the endpoints by importing them
+        const endpoints = require('../../myfigpoint_api_endpoints.json');
+        if (endpoints && endpoints.endpoints) {
+          setTestResults(prev => prev + '   ✓ Endpoints configuration loaded successfully\n');
+          setTestResults(prev => prev + `   ✓ Found ${Object.keys(endpoints.endpoints).length} endpoint categories\n`);
+        } else {
+          setTestResults(prev => prev + '   ✗ Endpoints configuration not found\n');
+        }
+      } catch (error) {
+        setTestResults(prev => prev + `   ✗ Error loading endpoints: ${error.message}\n`);
+      }
+
+      // Test 3: Test specific API calls
+      setTestResults(prev => prev + '\n3. Testing specific API methods...\n');
+      
+      // Test if the API service methods exist
+      const methodsToTest = [
+        { name: 'login', exists: typeof apiService.login === 'function' },
+        { name: 'register', exists: typeof apiService.register === 'function' },
+        { name: 'getProfile', exists: typeof apiService.getProfile === 'function' },
+        { name: 'getPointsBalance', exists: typeof apiService.getPointsBalance === 'function' },
+        { name: 'getTasks', exists: typeof apiService.getTasks === 'function' },
+        { name: 'redeemCode', exists: typeof apiService.redeemCode === 'function' },
+      ];
+
+      methodsToTest.forEach(method => {
+        setTestResults(prev => prev + `   ${method.exists ? '✓' : '✗'} ${method.name} method: ${method.exists ? 'Available' : 'Missing'}\n`);
+      });
+
+      setTestResults(prev => prev + '\nAPI Integration Test Completed!');
+      
     } catch (error) {
-      setTestResults(prev => ({
-        ...prev,
-        [testName]: { success: false, error: error.message, timestamp: new Date().toISOString() }
-      }));
-      Alert.alert('Error', `Test ${testName} failed: ${error.message}`);
+      setTestResults(prev => prev + `\nError during testing: ${error.message}`);
     } finally {
-      setLoading(prev => ({ ...prev, [testName]: false }));
+      setIsLoading(false);
     }
   };
 
-  const tests = {
-    'ping-server': async () => {
-      // Test basic connectivity by trying to get user profile
-      // This will fail if not authenticated, but should show network connectivity
-      try {
-        const result = await apiService.getProfile();
-        return result;
-      } catch (error) {
-        if (error.message.includes('401')) {
-          // This is expected if not logged in, but means we can reach the server
-          return { message: 'Server reachable, but not authenticated (401 expected)' };
-        }
-        throw error;
-      }
-    },
-    'get-points-balance': async () => {
-      return await apiService.getPointsBalance();
-    },
-    'get-tasks': async () => {
-      return await apiService.getTasks();
-    },
-    'get-notifications': async () => {
-      return await apiService.getNotifications();
-    }
+  const clearResults = () => {
+    setTestResults('');
   };
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text variant="headlineSmall" style={styles.title}>API Debug Screen</Text>
-        <Text style={styles.subtitle}>Test API connectivity and functionality</Text>
-      </View>
-
-      <Surface style={styles.card} elevation={2}>
-        <Text variant="titleMedium" style={styles.sectionTitle}>API Connectivity Tests</Text>
+      <View style={styles.content}>
+        <Text style={styles.title}>API Integration Debug Screen</Text>
+        <Text style={styles.description}>
+          This screen tests the API integration with the backend server based on the API documentation.
+        </Text>
         
-        {Object.keys(tests).map((testName) => (
-          <View key={testName} style={styles.testRow}>
-            <Button
-              title={loading[testName] ? 'Testing...' : `Run ${testName}`}
-              onPress={() => runTest(testName, tests[testName])}
-              disabled={loading[testName]}
-            />
-            {testResults[testName] && (
-              <View style={styles.resultContainer}>
-                <Text style={[
-                  styles.resultText, 
-                  { color: testResults[testName].success ? Colors.success : Colors.error }
-                ]}>
-                  {testResults[testName].success ? '✓ Success' : '✗ Failed'} - {testResults[testName].timestamp}
-                </Text>
-                {testResults[testName].success && (
-                  <Text style={styles.resultDetails} numberOfLines={2}>
-                    Result: {JSON.stringify(testResults[testName].result).substring(0, 100)}...
-                  </Text>
-                )}
-                {!testResults[testName].success && (
-                  <Text style={styles.resultDetails}>
-                    Error: {testResults[testName].error}
-                  </Text>
-                )}
-              </View>
-            )}
+        <View style={styles.buttonContainer}>
+          <Button 
+            title={isLoading ? "Testing..." : "Run API Tests"} 
+            onPress={runApiTests} 
+            disabled={isLoading}
+            color="#007AFF"
+          />
+        </View>
+        
+        <View style={styles.buttonContainer}>
+          <Button 
+            title="Clear Results" 
+            onPress={clearResults} 
+            color="#FF3B30"
+          />
+        </View>
+        
+        {testResults ? (
+          <View style={styles.resultsContainer}>
+            <Text style={styles.resultsTitle}>Test Results:</Text>
+            <Text style={styles.resultsText}>{testResults}</Text>
           </View>
-        ))}
-      </Surface>
-
-      <Surface style={styles.card} elevation={2}>
-        <Text variant="titleMedium" style={styles.sectionTitle}>Server Information</Text>
-        <Text style={styles.infoText}>Base URL: {apiService.baseURL}</Text>
-        <Text style={styles.infoText}>Environment: {__DEV__ ? 'Development' : 'Production'}</Text>
-      </Surface>
+        ) : null}
+      </View>
     </ScrollView>
   );
 };
@@ -108,55 +114,49 @@ const DebugScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: '#f5f5f5',
   },
-  header: {
-    padding: Spacing.l,
-    backgroundColor: Colors.surface,
-    alignItems: 'center',
+  content: {
+    padding: 20,
   },
   title: {
+    fontSize: 24,
     fontWeight: 'bold',
-    color: Colors.primary,
-    marginBottom: 4,
-  },
-  subtitle: {
-    color: Colors.textSecondary,
     textAlign: 'center',
+    marginBottom: 10,
+    color: '#333',
   },
-  card: {
-    margin: Spacing.m,
-    padding: Spacing.m,
-    backgroundColor: Colors.white,
-    borderRadius: 16,
+  description: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 20,
+    color: '#666',
+    lineHeight: 22,
   },
-  sectionTitle: {
+  buttonContainer: {
+    marginBottom: 15,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  resultsContainer: {
+    marginTop: 20,
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  resultsTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
-    color: Colors.text,
-    marginBottom: Spacing.m,
+    marginBottom: 10,
+    color: '#333',
   },
-  testRow: {
-    marginBottom: Spacing.m,
-    paddingVertical: Spacing.s,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-  },
-  resultContainer: {
-    marginTop: Spacing.s,
-  },
-  resultText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  resultDetails: {
-    fontSize: 11,
-    color: Colors.textSecondary,
-    marginTop: 4,
-  },
-  infoText: {
-    fontSize: 12,
-    color: Colors.text,
-    marginBottom: 4,
+  resultsText: {
+    fontSize: 14,
+    fontFamily: 'monospace',
+    color: '#333',
+    lineHeight: 20,
   },
 });
 

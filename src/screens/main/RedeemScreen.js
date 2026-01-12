@@ -13,7 +13,7 @@ export default function RedeemScreen({ navigation }) {
     const [balance, setBalance] = useState(0);
     const [loading, setLoading] = useState(false);
     const { user } = useUser();
-    
+
     useEffect(() => {
         const fetchBalance = async () => {
             try {
@@ -23,76 +23,117 @@ export default function RedeemScreen({ navigation }) {
                 console.error('Error fetching balance:', error);
             }
         };
-        
+
         if (user?.isLoggedIn) {
             fetchBalance();
         }
     }, [user]);
     
-    const handleWithdrawal = async () => {
+    // Refresh data when coming back to the screen
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            if (user?.isLoggedIn) {
+                const fetchBalance = async () => {
+                    try {
+                        const response = await apiService.getPointsBalance();
+                        setBalance(response.points_balance);
+                    } catch (error) {
+                        console.error('Error fetching balance:', error);
+                    }
+                };
+                fetchBalance();
+            }
+        });
+        
+        return unsubscribe;
+    }, [navigation, user]);
+
+    const handleRedemption = async () => {
         if (!points) {
-            Alert.alert('Error', 'Please enter the number of points to withdraw');
+            Alert.alert('Error', 'Please enter the number of points to redeem');
             return;
         }
-        
+
         const pointsValue = parseFloat(points);
         if (isNaN(pointsValue) || pointsValue <= 0) {
             Alert.alert('Error', 'Please enter a valid number of points');
             return;
         }
-        
+
         if (pointsValue > balance) {
             Alert.alert('Error', 'Insufficient points balance');
             return;
         }
-        
+
         setLoading(true);
         try {
             const withdrawalData = {
                 points: pointsValue,
                 method: 'bank' // Default to bank withdrawal
             };
-            
+
             const response = await apiService.withdrawPoints(withdrawalData);
-            
+
             Alert.alert('Success', response.message, [
-                { text: 'OK', onPress: () => {
-                    setPoints('');
-                    setBalance(response.new_balance);
-                }}
+                {
+                    text: 'OK', onPress: () => {
+                        setPoints('');
+                        setBalance(response.new_balance);
+                    }
+                }
             ]);
         } catch (error) {
-            Alert.alert('Error', error.message || 'Failed to process withdrawal');
-        } finally {
-            setLoading(false);
-        }
-    };
-    
-    const handleApplyCode = async () => {
-        if (!code) {
-            Alert.alert('Error', 'Please enter a code');
-            return;
-        }
-        
-        setLoading(true);
-        try {
-            const codeData = { code };
-            const response = await apiService.redeemCode(codeData);
-            
-            Alert.alert('Success', response.message, [
-                { text: 'OK', onPress: () => {
-                    setCode('');
-                    setBalance(response.new_balance);
-                }}
-            ]);
-        } catch (error) {
-            Alert.alert('Error', error.message || 'Failed to redeem code');
+            Alert.alert('Error', error.message || 'Failed to process redemption');
         } finally {
             setLoading(false);
         }
     };
 
-    
+    const handleApplyCode = async () => {
+        if (!code) {
+            Alert.alert('Error', 'Please enter a code');
+            return;
+        }
+
+        // Validate code format: 5 uppercase letters + 3 digits
+        const codeRegex = /^[A-Z]{5}\d{3}$/;
+        if (!codeRegex.test(code)) {
+            Alert.alert('Error', 'Invalid code format. Code should be 5 uppercase letters followed by 3 digits (e.g., ABCDE123)');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const codeData = { code };
+            const response = await apiService.redeemCode(codeData);
+
+            Alert.alert('Success', response.message, [
+                {
+                    text: 'OK', onPress: () => {
+                        setCode('');
+                        setBalance(response.new_balance);
+                    }
+                }
+            ]);
+        } catch (error) {
+            console.error('Redeem code error:', error);
+            console.log('Attempting to redeem code:', code); // Debug log
+            let errorMessage = error.message || 'Failed to redeem code';
+            
+            // Provide more specific error messages
+            if (error.message && error.message.includes('404')) {
+                errorMessage = 'Invalid code or code not found. Please check the code and try again.';
+            } else if (error.message && error.message.includes('400')) {
+                errorMessage = 'Invalid code format or code already used.';
+            }
+            
+            Alert.alert('Error', errorMessage);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -106,7 +147,7 @@ export default function RedeemScreen({ navigation }) {
                         style={styles.gradientHeader}
                     >
                         <View style={styles.headerContent}>
-                            <Text variant="headlineSmall" style={styles.headerTitle}>Redeemption</Text>
+                            <Text variant="headlineSmall" style={styles.headerTitle}>Redemption</Text>
                             <Text style={styles.headerSubtitle}>Convert your hard-earned points</Text>
                         </View>
                     </LinearGradient>
@@ -144,7 +185,7 @@ export default function RedeemScreen({ navigation }) {
                             <View style={[styles.iconBox, { backgroundColor: '#E3F2FD' }]}>
                                 <MaterialCommunityIcons name="cash-fast" size={24} color={Colors.secondary} />
                             </View>
-                            <Text variant="titleMedium" style={styles.cardTitle}>Withdraw Points</Text>
+                            <Text variant="titleMedium" style={styles.cardTitle}>Redeem Points</Text>
                         </View>
 
                         <TextInput
@@ -159,22 +200,17 @@ export default function RedeemScreen({ navigation }) {
                             right={<TextInput.Affix text="PTS" />}
                         />
 
-                        <View style={styles.warningBox}>
-                            <MaterialCommunityIcons name="information-outline" size={20} color={Colors.warning} />
-                            <Text style={styles.warningText}>
-                                Please ensure your bank details are updated on our <Text style={{ fontWeight: 'bold' }}>web portal</Text> before proceeding.
-                            </Text>
-                        </View>
+
 
                         <Button
                             mode="contained"
-                            onPress={handleWithdrawal}
+                            onPress={handleRedemption}
                             style={styles.submitBtn}
                             contentStyle={{ paddingVertical: 6 }}
                             loading={loading}
                             disabled={loading || !points}
                         >
-                            {loading ? 'Processing...' : 'Request Withdrawal'}
+                            {loading ? 'Processing...' : 'Submit Redemption Request'}
                         </Button>
                     </Surface>
                 </View>
@@ -186,16 +222,25 @@ export default function RedeemScreen({ navigation }) {
                             <View style={[styles.iconBox, { backgroundColor: '#F3E5F5' }]}>
                                 <MaterialCommunityIcons name="ticket-confirmation" size={24} color="#8E24AA" />
                             </View>
-                            <Text variant="titleMedium" style={styles.cardTitle}>Have a Gift Code?</Text>
+                            <View style={styles.sectionHeader}>
+                                <Text variant="titleMedium" style={styles.cardTitle}>Redeem Code</Text>
+                                <TouchableOpacity onPress={() => navigation.navigate('CodeHistory')}>
+                                    <Text style={styles.viewAllText}>View History</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
 
-                        <Text style={styles.helperText}>Enter your special code to add points instantly to your balance.</Text>
+                        <Text style={styles.helperText}>Enter your code to redeem points.</Text>
 
                         <View style={styles.codeRow}>
                             <TextInput
                                 placeholder="ENTER CODE"
                                 value={code}
-                                onChangeText={(text) => setCode(text.toUpperCase())}
+                                onChangeText={(text) => {
+                                    // Only allow uppercase letters and digits
+                                    const cleanedText = text.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                                    setCode(cleanedText);
+                                }}
                                 mode="outlined"
                                 style={[styles.input, { flex: 1, marginBottom: 0 }]}
                                 outlineColor={Colors.border}
@@ -311,6 +356,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 20
     },
+    sectionHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flex: 1,
+    },
     iconBox: {
         width: 40,
         height: 40,
@@ -322,6 +373,11 @@ const styles = StyleSheet.create({
     cardTitle: {
         fontWeight: 'bold',
         color: Colors.text
+    },
+    viewAllText: {
+        color: Colors.primary,
+        fontWeight: '600',
+        fontSize: 14
     },
     input: {
         backgroundColor: Colors.white,

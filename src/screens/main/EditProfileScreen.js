@@ -16,9 +16,7 @@ export default function EditProfileScreen({ navigation }) {
     const [name, setName] = useState(user?.full_name || user?.name || '');
     const [email, setEmail] = useState(user?.email || '');
     const [phone, setPhone] = useState(user?.phone || '');
-    const [bankName, setBankName] = useState(user?.bank_name || '');
-    const [accountName, setAccountName] = useState(user?.account_name || '');
-    const [accountNumber, setAccountNumber] = useState(user?.account_number || '');
+
     const [image, setImage] = useState(user?.profileImage);
     const [originalImage, setOriginalImage] = useState(user?.profileImage);
     const [loading, setLoading] = useState(false);
@@ -80,9 +78,6 @@ export default function EditProfileScreen({ navigation }) {
             const profileData = {
                 full_name: name,
                 phone,
-                bank_name: bankName,
-                account_name: accountName,
-                account_number: accountNumber
             };
             
             // Update profile data on server
@@ -233,40 +228,7 @@ export default function EditProfileScreen({ navigation }) {
                             left={<TextInput.Icon icon="phone" color={Colors.textSecondary} />}
                         />
                         
-                        {/* Bank Details Section */}
-                        <Text variant="titleMedium" style={styles.sectionTitle}>Bank Details</Text>
-                        
-                        <TextInput
-                            label="Bank Name"
-                            value={bankName}
-                            onChangeText={setBankName}
-                            mode="outlined"
-                            style={styles.input}
-                            outlineColor={Colors.border}
-                            activeOutlineColor={Colors.primary}
-                            left={<TextInput.Icon icon="bank" color={Colors.textSecondary} />}
-                        />
-                        <TextInput
-                            label="Account Name"
-                            value={accountName}
-                            onChangeText={setAccountName}
-                            mode="outlined"
-                            style={styles.input}
-                            outlineColor={Colors.border}
-                            activeOutlineColor={Colors.primary}
-                            left={<TextInput.Icon icon="card-account-details" color={Colors.textSecondary} />}
-                        />
-                        <TextInput
-                            label="Account Number"
-                            value={accountNumber}
-                            onChangeText={setAccountNumber}
-                            mode="outlined"
-                            style={styles.input}
-                            outlineColor={Colors.border}
-                            activeOutlineColor={Colors.primary}
-                            keyboardType="numeric"
-                            left={<TextInput.Icon icon="numeric" color={Colors.textSecondary} />}
-                        />
+
                         <Button
                             mode="contained"
                             onPress={handleSave}
@@ -382,13 +344,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.white,
         marginBottom: 16,
     },
-    sectionTitle: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: Colors.text,
-        marginBottom: 16,
-        marginTop: 8,
-    },
+
     saveBtn: {
         marginTop: 10,
         borderRadius: 12,

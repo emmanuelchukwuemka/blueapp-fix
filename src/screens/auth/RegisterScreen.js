@@ -68,23 +68,23 @@ export default function RegisterScreen({ navigation }) {
     };
 
     const [loading, setLoading] = useState(false);
-    
+
     const handleRegister = async () => {
         if (!email || !password || !confirmPassword) {
             Alert.alert('Error', 'Please fill in all required fields');
             return;
         }
-        
+
         if (password !== confirmPassword) {
             Alert.alert('Error', 'Passwords do not match');
             return;
         }
-        
+
         if (!checked) {
             Alert.alert('Error', 'Please agree to the Terms & Conditions');
             return;
         }
-        
+
         setLoading(true);
         try {
             const userData = {
@@ -92,19 +92,19 @@ export default function RegisterScreen({ navigation }) {
                 email,
                 password,
             };
-            
+
             if (phone) {
                 userData.phone = phone;
             }
-            
+
             const response = await apiService.register(userData);
-            
+
             // Save the token to AsyncStorage
             await apiService.setToken(response.access_token);
-            
+
             // Update user context with user data
             updateUser(response.user);
-            
+
             navigation.navigate('Main');
         } catch (error) {
             Alert.alert('Registration Error', error.message || 'Failed to register');
@@ -140,7 +140,7 @@ export default function RegisterScreen({ navigation }) {
                             {accountType === 'partner' ? 'Partner Registration' : 'Create Account'}
                         </Text>
                         <Text style={styles.headerSubtitle}>
-                            Join BluePoint today and start earning.
+                            Join BluePoint today and start collecting points.
                         </Text>
                     </View>
 
@@ -268,7 +268,7 @@ export default function RegisterScreen({ navigation }) {
                                 color={accountType === 'partner' ? Colors.secondary : Colors.primary}
                             />
                             <TouchableOpacity onPress={() => setChecked(!checked)}>
-                                <Text style={styles.termsText}>I agree to the Terms & Conditions</Text>
+                                <Text style={styles.termsText}>I agree to the <Text style={{ fontWeight: 'bold', textDecorationLine: 'underline' }} onPress={() => navigation.navigate('TermsPrivacy')}>Terms & Conditions</Text></Text>
                             </TouchableOpacity>
                         </View>
 

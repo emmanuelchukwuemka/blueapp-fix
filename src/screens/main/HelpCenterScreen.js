@@ -28,12 +28,7 @@ export default function HelpCenterScreen({ navigation }) {
                     <List.Item title="Redemptions are processed within 24-48 hours." titleNumberOfLines={2} />
                 </List.Accordion>
 
-                <List.Accordion
-                    title="How to update bank details?"
-                    left={props => <List.Icon {...props} icon="bank-outline" />}
-                >
-                    <List.Item title="Please visit the MyFigPoint web app to manage bank settings." titleNumberOfLines={3} />
-                </List.Accordion>
+
             </List.Section>
 
             <TouchableOpacity style={styles.contactBtn} onPress={() => navigation.navigate('SupportTicket')} activeOpacity={0.8}>
