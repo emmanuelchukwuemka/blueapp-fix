@@ -16,7 +16,11 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.myfigapp",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -25,19 +29,10 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.anonymous.myfigapp",
-      "networkSecurityConfig": {
-        "domainConfigs": [
-          {
-            "domains": [
-              "72.62.4.119"
-            ],
-            "subDomainsEnabled": true,
-            "cleartextTrafficPermitted": true
-          }
-        ],
-        "cleartextTrafficPermitted": true
-      },
+      "usesCleartextTraffic": true,
       "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE",
         "android.permission.RECORD_AUDIO"
       ]
     },
